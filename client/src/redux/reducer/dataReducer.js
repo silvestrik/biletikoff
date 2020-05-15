@@ -18,7 +18,8 @@ import {
     FILTERED_ARRAY_LENGTH_STATUS,
     SEARCH_STATUS,  
     ERROR_MESSAGE_SEARCH_FORM,
-    SEARCH_ID_RECEIVED
+    SEARCH_ID_RECEIVED,   
+    FORM_VISIBLE
 } from "../type"
 
 const initialState = {
@@ -56,8 +57,7 @@ const initialState = {
         duration: [],
         durationComback:[]
     },
-    loading: false,
-    currency: 'rub',
+    loading: false,    
     // статус поиска
     searchStatus: false,
     // ничего не найдено,
@@ -65,7 +65,9 @@ const initialState = {
     // смягчите фильтры
     filteredArrayLengthStatus: '',
     errorMessage: '',
-    timeOfReceiptSearchId: '' 
+    timeOfReceiptSearchId: '',
+    localStorageStatus: false,
+    formVisible: true 
 }
 
 export default function (state = initialState, action) { 
@@ -83,7 +85,7 @@ export default function (state = initialState, action) {
         case UPDATE_GEOIP: 
             return {
                 ...state,
-                geoData: action.payload
+                geoData: action.payload,
             }             
         case UPDATE_ORIGIN_DATA:
             return {

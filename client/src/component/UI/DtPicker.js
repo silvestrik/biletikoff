@@ -28,12 +28,40 @@ class DtPicker extends Component {
 
     componentDidMount(){        
         if(this.state.dateType === 'originDate') {
+            // дата туда по умолчанию
             this.setState({
-                date: new Date().setDate(new Date().getDate()+3)
-            })       
+                date: new Date().setDate(new Date().getDate()+7)
+            }) 
+
+            var d = new Date().getDate()+7
+            if (d < 10) { 
+                d = "0" + d; 
+            }
+            var m = new Date().getMonth()+1                     
+            if (m < 10) { 
+                m = "0" + m; 
+            }
+            const y = new Date().getFullYear()   
+            const currentDate = `${y}-${m}-${d}`
+            this.props.setDate(currentDate)  
+            
+            // дата обратно по умолчанию
+            var d1 = new Date().getDate()+17
+            if (d1 < 10) { 
+                d1 = "0" + d1; 
+            }
+            var m1 = new Date().getMonth()+1                     
+            if (m1 < 10) { 
+                m1 = "0" + m1; 
+            }
+            const y1 = new Date().getFullYear()   
+            const currentDateCompack = `${y1}-${m1}-${d1}`
+            console.log(currentDateCompack)
+            this.props.setCombackDate(currentDateCompack)            
+
         } else {
             this.setState({
-                date: new Date().setDate(new Date().getDate()+10)
+                date: new Date().setDate(new Date().getDate()+17)
             })
         }
     }        
@@ -49,6 +77,8 @@ class DtPicker extends Component {
             this.props.setDate(fDate)
        }       
     }
+
+    
 
     render() {       
         return (

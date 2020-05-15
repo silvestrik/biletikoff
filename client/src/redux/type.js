@@ -27,12 +27,15 @@ export const CHANGE_COMBACK_DATE = 'CHANGE_COMBACK_DATE'
 export const CHANGE_PASS_DATA = 'CHANGE_PASS_DATA'
 export const LOADING_DATA = 'LOADING_DATA'
 export const CHANGE_FILTERS = 'CHANGE_FILTERS'
- // статус поиска
- export const SEARCH_STATUS = 'SEARCH_STATUS'
- // ничего не найдено
- export const RESULT_IS_EMPTY = 'RESULT_IS_EMPTY'
- // смягчите фильтры
- export const FILTERED_ARRAY_LENGTH_STATUS = 'FILTERED_ARRAY_LENGTH_STATUS'
- // сообщение об ошибках заполнения формы поиска
- export const ERROR_MESSAGE_SEARCH_FORM = 'ERROR_MESSAGE_SEARCH_FORM'
- 
+// статус поиска
+export const SEARCH_STATUS = 'SEARCH_STATUS'
+// ничего не найдено
+export const RESULT_IS_EMPTY = 'RESULT_IS_EMPTY'
+// смягчите фильтры
+export const FILTERED_ARRAY_LENGTH_STATUS = 'FILTERED_ARRAY_LENGTH_STATUS'
+// сообщение об ошибках заполнения формы поиска
+export const ERROR_MESSAGE_SEARCH_FORM = 'ERROR_MESSAGE_SEARCH_FORM'
+//change language
+export const CHANGE_LANGUAGE = 'CHANGE_LANGUAGE'
+ //change currency
+export const CHANGE_CURRENCY = 'CHANGE_CURRENCY'

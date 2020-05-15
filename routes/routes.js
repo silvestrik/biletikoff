@@ -38,7 +38,7 @@ router.get('/geoip/:ip', async(req, res) => {
     }
 })
 
-router.post('/searchId', async (request, response) => {
+router.post('/getInitialData', async (request, response) => {
     try {  
         const { origin, destination, toDate, combackDate, tripClass, adults, child, baby } = request.body
 
@@ -106,8 +106,7 @@ router.post('/searchId', async (request, response) => {
                 trip_class: tripClass,
                 passengers: passengers_sorted,         
                 segments: segments
-            }            
-           
+            }
             
             //подготовка параметров
             const sorted_params = alphabeticSort(params) 
@@ -115,12 +114,7 @@ router.post('/searchId', async (request, response) => {
             const requestParams = requestTmp.replace(/,/g, ':')
             const signature =  md5(`${token}:${requestParams}`)     
            
-
-            //console.log('requestParams:', requestParams)
-            //console.log('signature:', signature)   
-            
-            //запрос для получения searchId        
-
+            //запрос для получения searchId 
             const searchParams = {
                 signature,
                 marker,
@@ -146,9 +140,12 @@ router.post('/searchId', async (request, response) => {
                     console.log(err)
                 })
                 //возвращаем данные с searchId и вспомогательную информацию
-                response.json(searchIdData)
+                if(searchIdData) {
+                    response.json(searchIdData)        
+                } else {
+                    response.status(500).json({message:'Видимо что то случилось...попробуйте позже'})
+                }                
         }
-
     } catch (error) {
         console.error(error)
     }

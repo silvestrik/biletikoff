@@ -24,7 +24,7 @@ import {
         FILTERED_ARRAY_LENGTH_STATUS,
         RESULT_IS_EMPTY,
         ERROR_MESSAGE_SEARCH_FORM,
-        SEARCH_ID_RECEIVED
+        SEARCH_ID_RECEIVED     
     } from '../type'
 
 import store from  '../store' 
@@ -50,7 +50,8 @@ export const geoIp = () => (dispatch) => {
                      getAutocomplete(response.data.name)
                         .then( response => { 
                             // выбираем нужный город по name и iata                            
-                            const filterData = response.data.filter(item => item.code === iataCode)                            
+                            const filterData = response.data.filter(item => item.code === iataCode)       
+                            //console.log(filterData[0])                     
                             dispatch({ type: PLACE_CHANGE })
                             dispatch({
                                 type: UPDATE_ORIGIN_DATA,
@@ -68,6 +69,46 @@ export const geoIp = () => (dispatch) => {
        console.log(err)
     })
 }
+
+// обновляем данные формы если что то есть в localStorage
+export const setStorageDataToForm  = () => dispatch => {   
+    let formData = localStorage.getItem('formData')
+    let formDataObj = JSON.parse(formData) 
+    const originIata = formDataObj.origin.code
+    const origin = formDataObj.origin.name
+    getAutocomplete(origin)
+        .then( response => { 
+            // выбираем нужный город по name и iata                            
+            const filterData = response.data.filter(item => item.code === originIata )       
+            //console.log(filterData[0])                     
+            dispatch({ type: PLACE_CHANGE })
+            dispatch({
+                type: UPDATE_ORIGIN_DATA,
+                payload: filterData[0]
+            })
+        })
+        .catch(error=> {
+            console.error(error)
+        })
+    if(formDataObj.destination ) {
+        var destination = formDataObj.destination.name
+        var destinationIata = formDataObj.destination.code 
+    }  
+    getAutocomplete(destination)
+        .then( response => { 
+            // выбираем нужный город по name и iata                            
+            const filterData = response.data.filter(item => item.code === destinationIata )
+            //console.log(filterData[0])                     
+            dispatch({ type: PLACE_CHANGE })
+            dispatch({
+                type: UPDATE_DESTINATION_DATA,
+                payload: filterData[0]
+            })                
+        })
+        .catch(error=> {
+            console.error(error)
+        })
+}  
 
 export const autocompleteOrigin = (data) => dispatch => {   
     dispatch({ type: PLACE_CHANGE })
@@ -103,7 +144,7 @@ export const setCombackDate = (data) => dispatch => {
 
 export const setPassData = (fieldName, fieldValue) => dispatch => {
     dispatch({ type: CHANGE_PASS_DATA})
-    console.log(fieldName, fieldValue)
+    //console.log(fieldName, fieldValue)
     dispatch({
          type: UPDATE_PASS_DATA,
          payload: { fieldName, fieldValue }         
@@ -112,7 +153,7 @@ export const setPassData = (fieldName, fieldValue) => dispatch => {
 
 export const preSimpleSearch = () => dispatch => {
     // TODO переделать !!!!!!
-    const tmpData = store.getState().data    
+    const tmpData = store.getState().data
     const simpleFormParams = tmpData.simpleFormParams   
     const origin = simpleFormParams.segments.origin.code  
     const toDate = simpleFormParams.segments.date   
@@ -130,7 +171,9 @@ export const preSimpleSearch = () => dispatch => {
     dispatch({ type: RESULT_IS_EMPTY, payload: false })
     dispatch({ type: FILTERED_ARRAY_LENGTH_STATUS, payload: false })
 
-    axios.post('/aviasales/searchId', {origin, destination, toDate, combackDate, tripClass, adults, child, baby})
+    //localStorage.setItem('lastFrmData', JSON.stringify(origin, destination, toDate, combackDate, tripClass, adults, child, baby))
+
+    axios.post('/aviasales/getInitialData', {origin, destination, toDate, combackDate, tripClass, adults, child, baby})
         .then(response => {
             dispatch({ type: ERROR_MESSAGE_SEARCH_FORM, payload: '' })
             const currency_rates = response.data.currency_rates
@@ -609,14 +652,13 @@ export const getBuyLink = (link, search_id) => dispatch =>{
 }
 
 // TODO
-// 4. история поисков, подстановка данных истории в поисковую форму - через local storage как вариант
-// 5. прокрутка наверх       https://reacttraining.com/react-router/web/guides/scroll-restoration/scroll-to-top window.scrollTo(0, 0);
-// 6. фильтр по валюте (в шапку)
 // 10. Сбросить все фильтры (сверху блока фильтров, появляется если выбран хоть один фильтр)
 // 12. Скелетоны билетов
- 
+// 13. Схлопывать форму при прокрутке или прокручить вверх
+// заменить "показать далее" на автоподгрузку
+// поправить кнопку "наверх"
 // по мере возможности
 // слайдер цены
-// слайдер ТУДА работает некорректно
+// слайдер обратно работает некорректно
 // слайдер время вылета: сделать как в продолжительности и задержке
-// заменить "показать далее" на автоподгрузку
+

@@ -4,10 +4,8 @@ import DtPicker from './UI/DtPicker'
 import ClassBox from './ClassBox'
 import { connect } from 'react-redux'
 import { preSimpleSearch}  from '../redux/actions/dataActions'
-import { geoIp } from '../redux/actions/dataActions'
+import { geoIp, setStorageDataToForm } from '../redux/actions/dataActions'
 import PropTypes from 'prop-types'
-import { setDate } from '../redux/actions/dataActions'
-import { formatDate } from '../function/formatDate'
 
 class SimpleSearchForm extends Component  { 
 
@@ -18,68 +16,98 @@ class SimpleSearchForm extends Component  {
             originIata: '', 
             destination: '',
             destinationIata: '',
-            geoIndex: false           
-        } 
+            status: false
+        }
     }
 
-    componentDidMount() { 
-        this.props.geoIp()
-        const currentDate = new Date()      
-        setDate(formatDate(currentDate))
-    }    
-   
-    //geoip + auto_origin
-    componentDidUpdate(prevProps) {        
-        if(prevProps.geoData.name !== this.props.geoData.name) {     
-            //console.log(prevProps.geoData.name, this.props.geoData.name)       
-            this.setState({
-                origin: this.props.geoData.name,
-                originIata: this.props.geoData.iata,
-                geoIndex: true 
-            })
-        }
+    componentDidMount() {       
+        if(localStorage.hasOwnProperty('formData')){           
+            this.props.setStorageDataToForm()
+        } else { 
+           this.props.geoIp()
+        }        
+    }
+    //scrollForm
+    componentDidUpdate(prevProps) {
+        if(localStorage.hasOwnProperty('formData')){
+            if(this.props.formData.origin && this.props.formData.destination){                
+                if(this.props.formData.origin.name !== this.state.origin) {                    
+                    this.setState({
+                        origin: this.props.formData.origin.name,
+                        originIata: this.props.formData.origin.code,
+                        destination: this.props.formData.destination.name,
+                        destinationIata: this.props.formData.destination.code,
+                        status: !this.state.status                       
+                    })                    
+                }               
+            }
+        } else {
+            if(prevProps.geoData.name !== this.props.geoData.name) {
+                //console.log(prevProps.geoData.name, this.props.geoData.name)
+                this.setState({
+                    origin: this.props.geoData.name,
+                    originIata: this.props.geoData.iata,
+                    status: !this.state.status                   
+                })                
+            }             
+        }        
     }
   
     //отправка запроса + конвертация даты       
     formSubmit = event => {       
-        event.preventDefault()  
-        //console.log(this.props.formData)
-        this.props.preSimpleSearch()
+        event.preventDefault()        
+        //this.props.preSimpleSearch()   
+        console.log(this.props.formData, this.props.passData)
+        localStorage.setItem('formData', JSON.stringify(this.props.formData))
+        localStorage.setItem('passData', JSON.stringify(this.props.passData))
     }
     
     render () {          
-        const { origin, originIata, destination, destinationIata, geoIndex} = this.state        
+        const { origin, originIata, destination, destinationIata } = this.state            
         return (             
-            <div>   
-                <div className="row" >
-                    <div className="col-xl-3 col-lg-3 col-md-6 col-sm-6">                        
-                           {geoIndex === false && 
-                            <InputAutocomplete 
-                                city = { origin }
-                                iata = { originIata }
-                                label = "Откуда"
-                                placeholder = "Пункт вылета"
-                                cityType = "origin"                           
-                            />
-                        }
-                        {geoIndex === true && 
+            <div>
+                <div className="row">
+                    <div className="col-xl-3 col-lg-3 col-md-6 col-sm-6">                   
+                        { this.state.status === false && 
                             <InputAutocomplete 
                                 city = { origin }
                                 iata = { originIata }
                                 label = "Откуда"
                                 placeholder = "Пункт вылета"
                                 cityType = "origin"
-                            />
-                        }
+                            /> 
+                        }  
+                        { this.state.status === true && 
+                            <InputAutocomplete 
+                                city = { origin }
+                                iata = { originIata }
+                                label = "Откуда"
+                                placeholder = "Пункт вылета"
+                                cityType = "origin"
+                            /> 
+                        }                     
                     </div>
-                    <div className="col-xl-3 col-lg-3 col-md-6 col-sm-6"> 
-                        <InputAutocomplete 
-                            city = { destination }
-                            iata = { destinationIata }
-                            label = "Куда"
-                            placeholder = "Пункт назначения"
-                            cityType = "destination"
-                        />
+                    <div className="col-xl-3 col-lg-3 col-md-6 col-sm-6">                    
+                        { this.state.status === true && 
+                            <InputAutocomplete 
+                                city = { destination }
+                                iata = { destinationIata }
+                                label = "Куда"
+                                placeholder = "Пункт назначения"
+                                cityType = "destination"
+                            />
+                        
+                        }
+                        { this.state.status === false && 
+                        
+                            <InputAutocomplete 
+                                city = { destination }
+                                iata = { destinationIata }
+                                label = "Куда"
+                                placeholder = "Пункт назначения"
+                                cityType = "destination"
+                            />
+                        } 
                     </div>                  
                     <div className="col-xl-2 col-lg-2 col-md-4 col-sm-4">
                         <label htmlFor="date-from" className="searchFormLabel">Дата</label> 
@@ -102,7 +130,7 @@ class SimpleSearchForm extends Component  {
                         <ClassBox/> 
                     </div>
                 </div> 
-                <div className="row" style={{textAlign: "right"}}>
+                <div className="row" style={{textAlign: "right", marginTop: 15}} > 
                     <div className="col-xl-8 col-lg-8"></div>      
                     <div className="col-xl-4 col-lg-4 col-md-12 col-sm-12">
                         <button 
@@ -113,7 +141,7 @@ class SimpleSearchForm extends Component  {
                             Найти билеты
                         </button> 
                     </div>
-                </div>                                 
+                </div>                            
             </div>
         )
     }    
@@ -121,7 +149,9 @@ class SimpleSearchForm extends Component  {
 
 SimpleSearchForm.propTypes = {
     geoIp: PropTypes.func.isRequired,
-    proposals: PropTypes.array
+    setStorageDataToForm: PropTypes.func.isRequired,
+    proposals: PropTypes.array,
+    localStorageStatus: PropTypes.bool
 }   
 
 // чтение состояния
@@ -133,10 +163,13 @@ const mapStateToProps = state => ({
     geoData: state.data.geoData,
     proposals: state.data.proposals,
     formData: state.data.simpleFormParams.segments,
-    passData: state.data.passData
+    passData: state.data.passData,
+    currency: state.UI.currency,
+    language: state.UI.language,
+    localStorageStatus: state.data.localStorageStatus
 })
 
 // передачи события
-const mapDispatchToProps = { geoIp, preSimpleSearch }
+const mapDispatchToProps = { geoIp, setStorageDataToForm, preSimpleSearch }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SimpleSearchForm) 

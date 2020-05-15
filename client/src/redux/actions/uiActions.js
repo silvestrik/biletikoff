@@ -1,4 +1,4 @@
-import { SEARCH_FORM_TYPE } from '../type'
+import { SEARCH_FORM_TYPE, CHANGE_LANGUAGE, CHANGE_CURRENCY } from '../type'
 
 export const searchFormType = (type) => (dispatch) => {
     if(type === 'composite') {
@@ -22,5 +22,19 @@ export const searchFormType = (type) => (dispatch) => {
             oneway: false, 
             routeType: 'round'
         })
+    }
+}
+
+export const changeLanguageAndCurrency = (name, value) => dispatch => {
+    if(name==="itemLanguage") {
+        dispatch({
+            type: CHANGE_LANGUAGE,
+            payload: value
+        })        
+    } else {
+        dispatch({
+            type: CHANGE_CURRENCY,
+            payload: value
+        })        
     }
 }

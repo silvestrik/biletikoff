@@ -21,7 +21,8 @@ class  Search extends Component {
             proposalsLength: 0,
             loading: false,
             //
-            allChecked: true
+            allChecked: true,
+            formVisible: true
         }        
         this.typeHandler = this.typeHandler.bind(this)        
     }  
@@ -52,10 +53,19 @@ class  Search extends Component {
         }              
     }
 
+    // видимость формы поиска
+    handlerVisibleForm = e => {       
+        this.setState({
+            formVisible: !this.state.formVisible
+        })
+    }
+
     render () {
         return (
-            <div className="col-md-12">
-                <div style={{width: "100%", paddingTop: 20}} > 
+            <div className="col-md-12" style={{padding: "0 15px 0 15px" }}>
+                
+                {this.state.formVisible && 
+                    <div style={{width: "100%", paddingTop: 20}} >                     
                     <form className="searchFormHeader" onChange={this.typeHandler} >                
                         <div className="form-check form-check-inline">
                             <input 
@@ -89,7 +99,8 @@ class  Search extends Component {
                         </div>     
                         { this.props.multiForm ?  <CompositeForm/> :  <SimpleSearchForm props = {this.props.oneway} />}          
                     </form> 
-                </div>
+                </div>                
+                }
                 { this.props.loading &&
                     <div className="col-12" style={{padding: 10, textAlign: "center", minHeight: 50}}>
                         <div className="spinner-border" role="status">
@@ -97,7 +108,7 @@ class  Search extends Component {
                         </div>
                     </div>
                 }                 
-                <div className="row">
+                <div className="row" style={{marginTop: 10}}>
                     { this.props.resultIsEmpty && 
                         <div className="col-12">
                             <div style={{textAlign: "center"}} className="alert alert-primary" role="alert">
@@ -115,8 +126,9 @@ class  Search extends Component {
                     <div className="col-md-3 col-lg-3 col-xl-3 d-none d-sm-none d-md-block">
                         <Filter/>
                     </div> 
-                    { this.props.ticketsLength > 0 &&
-                        <div className="col-12 col-sm-6 d-md-none d-lg-none d-xs-none d-sm-block d-block" style={{margin: "7px 0 12px 0"}}>
+                    { this.props.ticketsLength ===0 &&
+                        <>
+                        <div className="col-6 col-sm-6 d-md-none d-lg-none d-xs-none d-sm-block d-block" style={{margin: "7px 0 12px 0"}}>
                             <button 
                                 className="btn btn-success" 
                                 onClick={() => this.refs.modal.open() }
@@ -135,6 +147,16 @@ class  Search extends Component {
                                 <Filter/>
                             </PureModal>
                         </div>
+                        <div className="col-6 col-sm-6 d-md-none d-lg-none d-xs-none d-sm-block d-block" style={{margin: "7px 0 12px 0"}}>
+                                <button
+                                className="btn btn-warning"
+                                style={{width: "100%"}}
+                                onClick={this.handlerVisibleForm}
+                                >
+                                Форма
+                                </button>   
+                        </div>
+                        </>                        
                     }
                     <div className="col-xl-9 col-lg-9 col-md-9 col-sm-12">
                         <SearchResult/>      
@@ -147,7 +169,7 @@ class  Search extends Component {
 
 Search.propTypes = {   
     searchFormType: PropTypes.func.isRequired,
-    currencies: PropTypes.object.isRequired,
+    currencies: PropTypes.object,
     routeType: PropTypes.string.isRequired,
     multiForm: PropTypes.bool.isRequired,
     oneway: PropTypes.bool.isRequired,
@@ -165,7 +187,8 @@ const mapStateToProps = state => ({
     loading: state.data.loading,
     resultIsEmpty: state.data.resultIsEmpty,
     errorMessage: state.data.errorMessage,
-    ticketsLength: state.data.ticketsLength
+    ticketsLength: state.data.ticketsLength,
+    scrollForm: state.data.scrollForm
 })
 
 const mapDispatchToProps = {searchFormType}

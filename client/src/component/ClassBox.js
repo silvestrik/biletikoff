@@ -3,26 +3,39 @@ import { setPassData } from '../redux/actions/dataActions'
 import propTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-class ClassBox extends Component {
+class ClassBox extends Component {  
 
-    state = {
-        passMenu: {
-            dropdown: 'dropdown',
-            dropdownMenu: 'dropdown-menu'
-        },
-        menuStatus: false,
-        form: {
+    constructor(props) {
+        super(props)
+        this.state = {
+            passMenu: {
+                dropdown: 'dropdown',
+                dropdownMenu: 'dropdown-menu'
+            },
+            menuStatus: false,        
             tripClass: 'Y',
-            adults: 1,
-            child: 0,
-            baby: 0
-        },
-        passCount: [1, 2, 3, 4, 5, 6, 7] 
+            disableAdultsPlus: false, 
+            disableAdultsMinus: false,
+            disableChildPlus: false,
+            disableChildMinus: false,
+            disableBabyPlus: false,
+            disableBabyMinus: false
+        }        
+    }
+
+    componentDidMount(){       
+        if(localStorage.hasOwnProperty('passData')){
+            let passData = localStorage.getItem('passData')
+            let passDataObj = JSON.parse(passData)
+            this.props.setPassData('tripClass', passDataObj.tripClass)
+            this.props.setPassData('adults', passDataObj.adults)
+            this.props.setPassData('baby', passDataObj.baby)
+            this.props.setPassData('child', passDataObj.child)                  
+        }        
     }
 
     // меню с пассажирами
-    menuHandler = event => {
-        console.log(this.state.menuStatus)
+    menuHandler = event => {       
         if(this.state.menuStatus === false){
             this.setState({
                 menuStatus: true,
@@ -39,7 +52,7 @@ class ClassBox extends Component {
                     dropdownMenu: 'dropdown-menu'        
                 }
             })            
-        }        
+        }
     }
 
     // закрыть меню с классом и составом пассажиров (по крестику)
@@ -62,30 +75,49 @@ class ClassBox extends Component {
         } else {
             return "бизнес"
         }
-    }       
+    } 
 
-    //состояние в редьюсер
-    changeHandler = event => { 
-        const fieldName = event.target.name
-        const fieldValue = event.target.value 
-        this.props.setPassData(fieldName, fieldValue)
+    //+- button
+    handlerCounter = (e, name, value) => {             
+        e.preventDefault()        
+        if(name==='adults-minus') {               
+            this.props.setPassData('adults', value)
+        } else if(name==='adults-plus') {           
+            this.props.setPassData('adults', value)            
+        } else if(name==='child-minus') {           
+            this.props.setPassData('child', this.props.passData.child-1)
+        } else if(name==='child-plus') {           
+            this.props.setPassData('child', this.props.passData.child+1)
+        } else if(name==='baby-minus') {           
+            this.props.setPassData('baby', this.props.passData.baby-1)    
+        } else if(name==='baby-plus') {           
+            this.props.setPassData('baby', this.props.passData.baby+1)
+        }
     }
 
-    render() {
+    // changeClass
+    changeHandler = event => {         
+        this.setState({
+            [event.target.name]: event.target.value 
+        }) 
+        this.props.setPassData(event.target.name, event.target.value)
+    }
+
+    render() {       
         return (
             <div className="form-group">
-            <label htmlFor="class_pass">Класс и пассажиры</label>                        
+            <label htmlFor="class_pass" style={{color: "#fff"}}>Класс и пассажиры</label>
             <div className={this.state.passMenu.dropdown}>
                 <button 
                     className="btn btn-secondary dropdown-toggle" 
                     type="button" id="dropdownMenuButton" 
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
                     onClick={this.menuHandler}
-                    style={{width: "100%", color: "#6c757d", background: "#fff"}}
+                    style={{width: "100%", color: "#6c757d", background: "#fff", textAlign: "left", borderRadius: "0px !important"}}
                 >
-                {this.state.form.adults} пасс., {this.classText(this.state.form.tripClass)}
+                {parseInt(this.props.passData.adults) + parseInt(this.props.passData.child) + parseInt(this.props.passData.baby)} пасс., {this.classText(this.state.tripClass)}
                 </button> 
-                <div className={this.state.passMenu.dropdownMenu} aria-labelledby="dropdownMenuButton">
+                <div className={this.state.passMenu.dropdownMenu} aria-labelledby="dropdownMenuButton"> 
                     <button 
                         type="button" 
                         className="close" 
@@ -97,30 +129,101 @@ class ClassBox extends Component {
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <div className="form-group">
-                        <label htmlFor="classPassanger">Класс</label>
-                        <select className="form-control" id="tripClass" name="tripClass" onChange={this.changeHandler}>
+                        <p style={{margin: "0 0 9px 0", fontWeight: "600"}}>Класс</p>
+                        <select 
+                            className="form-control"                            
+                            name="tripClass" 
+                            defaultValue={this.state.tripClass}
+                            onChange={this.changeHandler}>
                             <option value="Y">Эконом</option>
                             <option value="C">Бизнес</option>                                            
                         </select>
-                    </div>                                
-                    <div className="form-group">
-                        <label htmlFor="adults">Взрослые</label>
-                        <select className="form-control" id="adults" name="adults" onChange={this.changeHandler}>
-                            { this.state.passCount.map((index, item) =><option key={index} value={item+1}>{item+1}</option>) }
-                        </select>
+                    </div>
+                    <div className="counter-wrapper">    
+                        <p className="counter-button-block-name">Взрослые </p>
+                        <div className="counter-block">                       
+                        <button 
+                            disabled={ this.props.passData.adults <=1 ? true : false } 
+                            className="counter-button" 
+                            onClick={e => this.handlerCounter(e, 'adults-minus', this.props.passData.adults-1)}
+                        >
+                                <div className="counter-button-text-container">
+                                    <div className="counter-button-text-container-text">
+                                        -
+                                    </div>
+                                </div>
+                        </button>
+                        <div className="counter-value">
+                                {this.props.passData.adults}
+                        </div>
+                        <button 
+                            disabled={ this.props.passData.adults >=7 ? true : false } 
+                            className="counter-button" 
+                            onClick={e => this.handlerCounter(e, 'adults-plus', this.props.passData.adults+1)}>
+                                <div className="counter-button-text-container">
+                                    <div className="counter-button-text-container-text">
+                                        +
+                                    </div>
+                                </div>
+                        </button>
+                        </div>   
+                    </div>
+                    <div className="counter-wrapper" style={{marginTop: 5}}>
+                        <p className="counter-button-block-name">Дети <span className="counter-value-name">2-11</span></p>
+                        <div className="counter-block">                    
+                        <button 
+                            disabled={ this.props.passData.child <=0 ? true : false }
+                            className="counter-button" 
+                            onClick={e => this.handlerCounter(e, 'child-minus', this.props.passData.child-1)}>
+                                <div className="counter-button-text-container">
+                                    <div className="counter-button-text-container-text">
+                                        -
+                                    </div>
+                                </div>
+                        </button>
+                        <div className="counter-value">
+                                {this.props.passData.child}
+                        </div>
+                        <button 
+                            disabled={ this.props.passData.child >=7 ? true : false }
+                            className="counter-button" 
+                            onClick={e => this.handlerCounter(e, 'child-plus', this.props.passData.child+1)}>
+                                <div className="counter-button-text-container">
+                                    <div className="counter-button-text-container-text">
+                                        +
+                                    </div>
+                                </div>
+                        </button>
+                        </div>
                     </div> 
-                    <div className="form-group">
-                        <label htmlFor="child">Дети</label>
-                        <select className="form-control" id="child" name="child" onChange={this.changeHandler}>
-                            { this.state.passCount.map((index, item) =><option key={index} value={item}>{item}</option>) }
-                        </select>
-                    </div> 
-                    <div className="form-group">
-                        <label htmlFor="baby">Младенцы</label>
-                        <select className="form-control" id="baby" name="baby" onChange={this.changeHandler}>
-                            { this.state.passCount.map((index, item) =><option key={index} value={item}>{item}</option>) }
-                        </select>
-                    </div>                                                        
+                    <div className="counter-wrapper" style={{marginTop: 5}}>
+                        <p className="counter-button-block-name">Младенцы <span className="counter-value-name">0-2</span></p>               
+                        <div className="counter-block">                        
+                        <button 
+                            disabled={ this.props.passData.baby <=0 ? true : false }
+                            className="counter-button" 
+                            onClick={e => this.handlerCounter(e, 'baby-minus', this.props.passData.baby-1)}>
+                                <div className="counter-button-text-container">
+                                    <div className="counter-button-text-container-text">
+                                        -
+                                    </div>
+                                </div>
+                        </button>
+                        <div className="counter-value">
+                                {this.props.passData.baby}
+                        </div>
+                        <button 
+                            disabled={ this.props.passData.baby >=7 ? true : false }
+                            className="counter-button" 
+                            onClick={e => this.handlerCounter(e, 'baby-plus', this.props.passData.baby+1)}>
+                                <div className="counter-button-text-container">
+                                    <div className="counter-button-text-container-text">
+                                        +
+                                    </div>
+                                </div>
+                        </button>
+                        </div> 
+                    </div>
                 </div>                            
             </div>
         </div>
@@ -133,10 +236,10 @@ ClassBox.propTypes = {
 }
 
 const mapStateToPops = state => ({
-    UI: state.UI
+    UI: state.UI,
+    passData: state.data.passData
 })
 
 const mapDispatchToProps = { setPassData }
-
 
 export default connect(mapStateToPops, mapDispatchToProps)(ClassBox)

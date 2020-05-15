@@ -104,6 +104,21 @@ export const formatTime = t => {
     return Math.floor(t/60)+" ч. "+t%60+" мин.";
 }
 
+export const formatLanguageName = data => {
+    switch (data) {
+        case 'RU':
+            return 'Русский'            
+        case 'EN':
+            return 'English'   
+        case 'DE':
+            return 'Deutsch'            
+        case 'ES':
+            return 'Español'        
+        default:
+            break;
+    }
+}
+
 //
 // export const plus7days = (data, day) => {
 //     data = data.split('/');

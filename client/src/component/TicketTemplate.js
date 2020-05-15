@@ -409,7 +409,7 @@ TicketTemplate.propTypes = {
 }
 
 const mapStateToProps = state => ({
-    currency: state.data.currency,
+    currency: state.UI.currency,
     filteredLength: state.data.filteredLength,
     search_id: state.data.search_id
 })

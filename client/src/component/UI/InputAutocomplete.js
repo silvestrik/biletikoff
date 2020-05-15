@@ -110,7 +110,8 @@ class InputAutocomplete extends Component {
         if(this.state.cityData && this.state.cityData.length>0 && showCityList) {
             cityListComponent = (
                 <ul className="cityList" >
-                { this.state.cityData.map((item, index) => { 
+                {    // eslint-disable-next-line    
+                    this.state.cityData.map((item, index) => { 
                         if(index <= 4) {
                             let className
 
