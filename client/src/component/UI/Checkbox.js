@@ -77,7 +77,7 @@ class Checkbox extends Component {
                             { index === 4 && 
                                 <button 
                                     type="button" 
-                                    className="btn btn-primary btn-sm"
+                                    className="btn btn-info btn-sm"
                                     onClick={this.showAll}
                                     style={this.state.BtnStyle}
                                 >

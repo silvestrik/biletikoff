@@ -18,8 +18,9 @@ import {
     FILTERED_ARRAY_LENGTH_STATUS,
     SEARCH_STATUS,  
     ERROR_MESSAGE_SEARCH_FORM,
-    SEARCH_ID_RECEIVED,   
-    FORM_VISIBLE
+    SEARCH_ID_RECEIVED,
+    FORM_VISIBLE,
+    INFOBOARD_VISIBLE   
 } from "../type"
 
 const initialState = {
@@ -67,7 +68,8 @@ const initialState = {
     errorMessage: '',
     timeOfReceiptSearchId: '',
     localStorageStatus: false,
-    formVisible: true 
+    infoboardVisible: false,
+    formVisible: true
 }
 
 export default function (state = initialState, action) { 
@@ -224,6 +226,18 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 timeOfReceiptSearchId: action.payload
+            }
+        }
+        case INFOBOARD_VISIBLE: {
+            return {
+                ...state,
+                infoboardVisible: action.payload
+            }
+        }
+        case FORM_VISIBLE: {
+            return {
+                ...state,
+                formVisible: action.payload
             }
         }
         default: 

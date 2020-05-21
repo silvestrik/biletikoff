@@ -4,7 +4,7 @@ import propTypes from 'prop-types'
 import DatePicker, { registerLocale } from 'react-datepicker'
 import ru from "date-fns/locale/ru"
 import "react-datepicker/dist/react-datepicker.css"
-import { subDays } from 'date-fns'
+import { subDays, toDate } from 'date-fns'
 //конвертация даты для API
 import { formatDate } from '../../function/formatDate' 
 import { connect } from 'react-redux'
@@ -26,44 +26,77 @@ class DtPicker extends Component {
         }
     } 
 
-    componentDidMount(){        
-        if(this.state.dateType === 'originDate') {
-            // дата туда по умолчанию
-            this.setState({
-                date: new Date().setDate(new Date().getDate()+7)
-            }) 
+    componentDidMount(){   
 
-            var d = new Date().getDate()+7
-            if (d < 10) { 
-                d = "0" + d; 
-            }
-            var m = new Date().getMonth()+1                     
-            if (m < 10) { 
-                m = "0" + m; 
-            }
-            const y = new Date().getFullYear()   
-            const currentDate = `${y}-${m}-${d}`
-            this.props.setDate(currentDate)  
-            
-            // дата обратно по умолчанию
-            var d1 = new Date().getDate()+17
-            if (d1 < 10) { 
-                d1 = "0" + d1; 
-            }
-            var m1 = new Date().getMonth()+1                     
-            if (m1 < 10) { 
-                m1 = "0" + m1; 
-            }
-            const y1 = new Date().getFullYear()   
-            const currentDateCompack = `${y1}-${m1}-${d1}`
-            console.log(currentDateCompack)
-            this.props.setCombackDate(currentDateCompack)            
-
-        } else {
-            this.setState({
-                date: new Date().setDate(new Date().getDate()+17)
-            })
+        function addDays(dateObj, numDays) {
+            dateObj.setDate(dateObj.getDate() + numDays);
+            return dateObj;
         }
+        
+        // если есть в localStorage
+        if(localStorage.hasOwnProperty('formData')){  
+            let formData = localStorage.getItem('formData')
+            var formDataObj = JSON.parse(formData) 
+            
+            if(formDataObj.date) {
+                var date = new Date(formDataObj.date).getTime()     
+                this.props.setDate(formDataObj.date)          
+            }
+
+            if(formDataObj.combackDate) {
+                var combackDate = new Date(formDataObj.combackDate).getTime()
+                this.props.setCombackDate(formDataObj.combackDate)
+            }            
+            
+            if(this.state.dateType === 'originDate') {
+                this.setState({
+                    date: date
+                })
+                
+            } else {
+                this.setState({
+                    date: combackDate
+                })                
+            }
+        } else {
+            if(this.state.dateType === 'originDate') {
+                
+                // дата туда по умолчанию
+                this.setState({
+                    date: new Date().setDate(new Date().getDate())+1000*60*60*24*7
+                }) 
+    
+                var plus7days = addDays(new Date(), 7)
+                var plus17days = addDays(new Date(), 17)
+                var d = plus7days.getDate()
+                if (d < 10) { 
+                    d = "0" + d; 
+                }
+                var m = plus7days.getMonth()+1                     
+                if (m < 10) { 
+                    m = "0" + m; 
+                }
+                const y = plus7days.getFullYear()   
+                const currentDate = `${y}-${m}-${d}`
+                this.props.setDate(currentDate)
+                // дата обратно по умолчанию
+                var d1 = plus17days.getDate()
+                if (d1 < 10) { 
+                    d1 = "0" + d1; 
+                }
+                var m1 = plus17days.getMonth()+1                     
+                if (m1 < 10) { 
+                    m1 = "0" + m1; 
+                }
+                const y1 = plus17days.getFullYear()   
+                const currentDateCompack = `${y1}-${m1}-${d1}`            
+                this.props.setCombackDate(currentDateCompack)
+            } else {
+                this.setState({
+                    date: new Date().setDate(new Date().getDate())+1000*60*60*24*17
+                })
+            }
+        }        
     }        
 
     setDate = event => {        

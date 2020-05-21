@@ -204,20 +204,19 @@ class TicketTemplate extends Component {
                             { this.props.search_id !== '' && 
                                 <button className="btn btn-success btn-sm" onClick={() => this.refs.modal.open() }>Посмотреть</button>
                             } 
-                            <PureModal
-                                header="Информация о рейсе"                              
+                            <PureModal                                                          
                                 onClose={() => {                    
                                     return true;
                                 }}               
                                 ref="modal"
-                                width="500px"
+                                width="375px"
                                 >
                                 { this.props.filteredLength>0 && data.direct_flights &&                                     
                                     <div className="flight__segment_info" style={{marginBottom: "10px"}}>
                                         <div className="flight__segment_data" style={{justifyContent: "start",
-                                            background: "#02122c", color: "#ffffff", padding: "5px"
+                                            background: "#02122c", color: "#ffffff", padding: "5px 3px 5px 3px"
                                         }}>       
-                                            <div className="flight__date">
+                                            <div className="flight__date" style={{paddingLeft: 0}}>
                                             <span><strong>Туда: </strong>перелет {formatTime(data.duration)}, пересадки {formatTime(data.delay)}</span>                                             
                                             </div>      
                                         </div>
@@ -282,9 +281,9 @@ class TicketTemplate extends Component {
                                 }
                                 <div className="flight__segment_info" style={{marginTop: "10px"}}>
                                     <div className="flight__segment_data" style={{justifyContent: "start",
-                                        background: "#02122c", color: "#ffffff", padding: "5px"
+                                        background: "#02122c", color: "#ffffff", padding: "5px 3px 5px 3px"
                                     }}>       
-                                        <div className="flight__date">
+                                        <div className="flight__date" style={{paddingLeft: 0}}>
                                         <span><strong>Обратно: </strong>перелет {formatTime(data.duration)}, пересадки {formatTime(data.delay)}</span>                                             
                                         </div>      
                                     </div>

@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import TicketTemplate from './TicketTemplate'
 import { preSimpleSearch } from '../redux/actions/dataActions'
+import TicketSkeleton from '../component/TicketSkeleton'
 
 class SearchResult extends Component {
 
@@ -56,7 +57,10 @@ class SearchResult extends Component {
                 <div style={{textAlign: "center"}} className="alert alert-success" role="alert">
                     Вариантов не осталось, смягчите фильтры
                 </div>
-                } 
+                }                 
+                { this.props.loading === true &&  this.props.ticketsLength === 0 &&
+                    <TicketSkeleton/>
+                }
                 { this.props.cheapets[0] && this.props.filtered && this.props.filteredLength > 0 &&
                   this.props.cheapets.map(ticket => <TicketTemplate key={ticket.index} ticket={ticket} type="cheapets"/>)
                 }
@@ -68,7 +72,7 @@ class SearchResult extends Component {
                 }   
                 { this.props.filteredLength > 10 && !this.props.searchStatus &&
                     <button className="btn btn-info" style={{width: "100%", marginBottom: "15px"}} onClick={this.moreTickets}>Показать еще</button>
-                }         
+                }
             </div>                          
         )
     }
@@ -97,7 +101,8 @@ const mapStateToProps = state => ({
     moreTickets: state.data.moreTickets,    
     filteredArrayLengthStatus: state.data.filteredArrayLengthStatus,
     searchStatus: state.data.searchStatus,
-    search_id: state.data.search_id
+    search_id: state.data.search_id,
+    loading: state.data.loading,
 })
 
 const mapDispatchToProps = { preSimpleSearch }

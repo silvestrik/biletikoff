@@ -24,7 +24,7 @@ class Slider extends Component {
     }
 
     // slider время полета обратно
-    handleChange = sliderValues => {        
+    handleChangeOne = sliderValues => {        
         const timeFromDep = sliderValues[0]
         const timeFromArr = sliderValues[1]
         const timeFromDepConvert = this.convertTime(timeFromDep)
@@ -33,23 +33,29 @@ class Slider extends Component {
         const t1=timeFromArrConvert.split(':')
         const fromTime = f1[0]*60*60 + f1[1]*60
         const toTime = t1[0]*60*60 + t1[1]*60
-        this.setState({ sliderValues })
-        
-        // console.log(sliderValues)
-
-        if(this.props.type === "fixedDefaultValue") {
-            if(this.props.combackRule) {               
-                this.props.filterChangeArrDepTime(this.props.codeTwo, fromTime, toTime)
-            } else {             
-                this.props.filterChangeArrDepTime(this.props.codeOne, fromTime, toTime)
-            }
+        this.setState({ sliderValues })        
+        if(this.props.type === "fixedDefaultValue" ) {           
+            this.props.filterChangeArrDepTime(this.props.codeOne, fromTime, toTime)          
         } else if(this.props.type === "dynamicDefaultValue") {
-            if(this.props.combackRule) {               
-                this.props.filterChangeArrDepTime(this.props.codeTwo, timeFromDep, timeFromArr)
-            } else {                
-                this.props.filterChangeArrDepTime(this.props.codeOne, timeFromDep, timeFromArr)
-            }
-        } 
+            this.props.filterChangeArrDepTime(this.props.codeOne, timeFromDep, timeFromArr)
+        }
+    }
+
+    handleChangeTwo = sliderValues => {        
+        const timeFromDep = sliderValues[0]
+        const timeFromArr = sliderValues[1]
+        const timeFromDepConvert = this.convertTime(timeFromDep)
+        const timeFromArrConvert = this.convertTime(timeFromArr)        
+        const f1=timeFromDepConvert.split(':');
+        const t1=timeFromArrConvert.split(':')
+        const fromTime = f1[0]*60*60 + f1[1]*60
+        const toTime = t1[0]*60*60 + t1[1]*60
+        this.setState({ sliderValues })        
+        if(this.props.type === "fixedDefaultValue" ) {           
+            this.props.filterChangeArrDepTime(this.props.codeTwo, fromTime, toTime)          
+        } else if(this.props.type === "dynamicDefaultValue") {
+            this.props.filterChangeArrDepTime(this.props.codeTwo, timeFromDep, timeFromArr)
+        }
     }
 
     render() {
@@ -63,25 +69,20 @@ class Slider extends Component {
                         min={this.props.sliderValues[0]}
                         max={this.props.sliderValues[1]}
                         step={1} 
-                        onAfterChange={this.handleChange}                            
+                        onAfterChange={this.handleChangeOne}                            
                         defaultValue={this.props.defaultSliderValues}                       
                         tipFormatter = {value => `${this.convertTime(value)}`}
                     /> 
                 </div>                        
-                { this.props.combackRule &&
-                <div style={{marginTop: 20}}>
-                    <p style={{marginTop: 20}}><strong>Обратно</strong></p>
-                    <p style={{fontSize: '0.8rem'}}>
-                        {this.convertTime(this.props.sliderValues[0])} - {this.convertTime(this.props.sliderValues[1])}
-                    </p> 
-                    
-                                              
+                { !this.props.oneway &&
+                <div style={{marginTop: 10}}>                   
+                    <p style={{fontSize: "12px"}}><span className="segment-head">Обратно </span> {this.convertTime(this.props.sliderValues[0])} - {this.convertTime(this.props.sliderValues[1])}</p>                
                     <div style={{padding: 5}}>
                         <Range
                             min={this.props.sliderValues[0]}
                             max={this.props.sliderValues[1]}
                             step={1} 
-                            onAfterChange={this.handleChange}
+                            onAfterChange={this.handleChangeTwo}
                             defaultValue={this.props.defaultSliderValues}                       
                             tipFormatter = {value => `${this.convertTime(value)}`}
                         />

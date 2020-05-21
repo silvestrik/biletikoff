@@ -23,14 +23,14 @@ export const plus7days = (data, day) => {
     data = data.join('/').replace(/(^|\/)(\d)(?=\/)/g,"$10$2");
     return data
 }
-// dt = new Date().setDate(new Date().getDate()+7)
-//alert(get("29/08/2013", 7));
 
-//сравнить даты
+var monthNames = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+var dayNames = ['вс','пн','вт','ср','чт','пт','сб'];
 
-// let now = new Date(),
-//     birthday = new Date('10/10/2001')
-
-// if (now > birthday) {
-//   // ...
-// }
+export const formatDateTopForm = data => {      
+    var day = new Date(data).getDate()
+    var weekday = new Date(data).getDay()
+    var month = new Date(data).getMonth()+1    
+    const newDate = `${day} ${monthNames[month]}, ${dayNames[weekday]}`
+    return newDate
+}

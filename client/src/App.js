@@ -7,12 +7,12 @@ import Header from './component/template/Header'
 import Footer from './component/template/Footer'
 
 function App() {
-  return (
+  return (    
     <Provider store = { store }>   
-    <Header/>    
-          <Search/>
-    <Footer/>      
-    </Provider>    
+      <Header/>    
+            <Search/>
+      <Footer/>      
+    </Provider>     
   )
 }
 

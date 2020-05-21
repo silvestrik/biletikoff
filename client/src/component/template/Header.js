@@ -59,7 +59,8 @@ class Header extends Component {
     
     render() { 
         return (
-            <div> 
+            <div style={{paddingTop: 20}}> 
+                <p className="logo__name">Biletikoff</p>
                 <div className="col-md-12" style={{display: "flex", justifyContent: "flex-end", top: 10}}> 
                     <button 
                         className="btn btn-success btn-sm"                                
@@ -85,8 +86,8 @@ class Header extends Component {
                         >
                             <option value="RU">Русский</option>
                             <option value="EN">English</option>
-                            <option value="DE">Deutsch</option>
-                            <option value="ES">Español</option>                                            
+                            {/* <option value="DE">Deutsch</option>
+                            <option value="ES">Español</option>                                             */}
                         </select>
                     </div> 
                     {this.props.currencies && this.props.ticketsLength >0 &&

@@ -37,5 +37,8 @@ export const FILTERED_ARRAY_LENGTH_STATUS = 'FILTERED_ARRAY_LENGTH_STATUS'
 export const ERROR_MESSAGE_SEARCH_FORM = 'ERROR_MESSAGE_SEARCH_FORM'
 //change language
 export const CHANGE_LANGUAGE = 'CHANGE_LANGUAGE'
- //change currency
+//change currency
 export const CHANGE_CURRENCY = 'CHANGE_CURRENCY'
+//видимость форма/инфо табло
+export const INFOBOARD_VISIBLE = 'INFOBOARD_VISIBLE'
+export const FORM_VISIBLE = 'FORM_VISIBLE'

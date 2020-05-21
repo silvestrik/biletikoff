@@ -24,7 +24,9 @@ import {
         FILTERED_ARRAY_LENGTH_STATUS,
         RESULT_IS_EMPTY,
         ERROR_MESSAGE_SEARCH_FORM,
-        SEARCH_ID_RECEIVED     
+        SEARCH_ID_RECEIVED,     
+        FORM_VISIBLE,
+        INFOBOARD_VISIBLE 
     } from '../type'
 
 import store from  '../store' 
@@ -72,10 +74,12 @@ export const geoIp = () => (dispatch) => {
 
 // обновляем данные формы если что то есть в localStorage
 export const setStorageDataToForm  = () => dispatch => {   
-    let formData = localStorage.getItem('formData')
-    let formDataObj = JSON.parse(formData) 
-    const originIata = formDataObj.origin.code
-    const origin = formDataObj.origin.name
+    if(localStorage.getItem('formData')){
+        let formData = localStorage.getItem('formData')
+        var formDataObj = JSON.parse(formData) 
+        var originIata = formDataObj.origin.code ? formDataObj.origin.code : 'MOW'
+        var origin = formDataObj.origin.name ? formDataObj.origin.name : 'Moscow'
+    }
     getAutocomplete(origin)
         .then( response => { 
             // выбираем нужный город по name и iata                            
@@ -90,7 +94,7 @@ export const setStorageDataToForm  = () => dispatch => {
         .catch(error=> {
             console.error(error)
         })
-    if(formDataObj.destination ) {
+    if(localStorage.getItem('formData') && formDataObj.destination ) {
         var destination = formDataObj.destination.name
         var destinationIata = formDataObj.destination.code 
     }  
@@ -194,6 +198,11 @@ export const preSimpleSearch = () => dispatch => {
                                 
                 const current_time = new Date()                    
                 dispatch({ type: SEARCH_ID_RECEIVED, payload: current_time })
+                
+                //показываем табло с данными о рейсе
+                dispatch({ type: FORM_VISIBLE, payload: false })
+                //скрываем форму
+                dispatch({ type: INFOBOARD_VISIBLE, payload: true })
                 
                 // запускаем таймер обратного отсчета времени и стираем searchId           
                 setTimeout(() => {
@@ -584,7 +593,7 @@ export const filterChangeArrDepTime = (type, fromTime, toTime) => dispatch => {
     const tickets = store.getState().data.tickets 
     var filtered = Object.assign([], tickets)
 
-    console.log('slider filtered before', filtered)
+    console.log('slider filtered before', type, fromTime, toTime)
 
     if(type==="sliderOneValues" && filtered.length>0) {        
         for(var i=filtered.length-1; i>=0; i--) {
@@ -639,7 +648,7 @@ export const filterChangeArrDepTime = (type, fromTime, toTime) => dispatch => {
     } else if(filtered.length !== 0) {
         dispatch({ type: FILTERED_ARRAY_LENGTH_STATUS, payload: false })                  
     }    
-    console.log('slider filtered after', filtered)
+    //console.log('slider filtered after', filtered)
 }
 
 export const getBuyLink = (link, search_id) => dispatch =>{        
@@ -651,14 +660,18 @@ export const getBuyLink = (link, search_id) => dispatch =>{
     }
 }
 
+//переключение видимости форма-инфотабло
+export const toggleForm = data => dispatch => {
+    dispatch({
+        type: FORM_VISIBLE,
+        payload: data
+    })
+}
+
 // TODO
 // 10. Сбросить все фильтры (сверху блока фильтров, появляется если выбран хоть один фильтр)
 // 12. Скелетоны билетов
-// 13. Схлопывать форму при прокрутке или прокручить вверх
 // заменить "показать далее" на автоподгрузку
-// поправить кнопку "наверх"
-// по мере возможности
 // слайдер цены
-// слайдер обратно работает некорректно
-// слайдер время вылета: сделать как в продолжительности и задержке
 
+// !!!!!!!! отключить инструменты разработчика REDUX

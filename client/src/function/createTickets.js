@@ -231,8 +231,8 @@ export const createTickets = _results => {
       
           if(_results['tickets'][i]['return_flights']) {
               for(let k in _results['tickets'][i]['return_flights']){
-                var durationComback=''
-                var delayComback=''
+                var durationComback=0
+                var delayComback=0
                 var throughComback=''
                 let t=_results['tickets'][i]['return_flights'][k];
                 //durationComback+=t['delay']+t['duration'];
