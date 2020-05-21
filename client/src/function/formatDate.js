@@ -30,7 +30,7 @@ var dayNames = ['вс','пн','вт','ср','чт','пт','сб'];
 export const formatDateTopForm = data => {      
     var day = new Date(data).getDate()
     var weekday = new Date(data).getDay()
-    var month = new Date(data).getMonth()+1    
+    var month = new Date(data).getMonth()    
     const newDate = `${day} ${monthNames[month]}, ${dayNames[weekday]}`
     return newDate
 }
