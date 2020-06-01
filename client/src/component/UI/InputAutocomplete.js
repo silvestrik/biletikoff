@@ -17,7 +17,7 @@ class InputAutocomplete extends Component {
             cityType: this.props.cityType,          
             activeCity: 0,         
             showCityList: false,
-            userInput: this.props.city,
+            userInput: this.props.city
         }
         this.cityInput = React.createRef() 
     }   

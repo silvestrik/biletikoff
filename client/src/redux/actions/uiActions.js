@@ -25,8 +25,8 @@ export const searchFormType = (type) => (dispatch) => {
     }
 }
 
-export const changeLanguageAndCurrency = (name, value) => dispatch => {
-    if(name==="itemLanguage") {
+export const changeLanguageAndCurrency = (name, value) => dispatch => {    
+    if(name==="language") {
         dispatch({
             type: CHANGE_LANGUAGE,
             payload: value

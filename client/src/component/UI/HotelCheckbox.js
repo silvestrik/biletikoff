@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
-import { changeFilters } from '../../redux/actions/dataActions'
+//import PropTypes from 'prop-types'
+import { changeHotelFilters } from '../../redux/actions/dataActions'
+import { hotelAmenitiesCheckbox } from '../../function/hotelAmenities'
 
-class Checkbox extends Component {
+class HotelCheckbox extends Component {
 
     constructor(props) {
         super(props)
@@ -25,19 +26,21 @@ class Checkbox extends Component {
     checkBoxHandler = (e, name, onlyChecked)  => {
         e.stopPropagation()
         this.setState({ allChecked: false })
-        this.props.changeFilters(name, onlyChecked)
+        this.props.changeHotelFilters(name, onlyChecked)
     }
    
     // выбор всех
     allCheckBoxHandler = (e, name)  => {          
-        //console.log('allCheckBoxHandler', name )  
+        console.log('allCheckBoxHandler', name )  
         const onlyChecked = 'all'      
-        this.props.changeFilters(name, onlyChecked)       
+        this.props.changeHotelFilters(name, onlyChecked)       
         this.setState({
             allChecked: !this.state.allChecked,
             onlyChecked: false
        })
     }
+
+
 
     render() {         
         return (
@@ -62,10 +65,19 @@ class Checkbox extends Component {
                             onClick = { e => this.checkBoxHandler(e, this.props.checkBoxPrefix +'_' + item.value, false)}                                                    
                         >
                         <input type="checkbox" checked={item.status} onChange={e => {}}/>                        
-                        <label className="g-text-overflow" htmlFor={this.props.checkBoxPrefix +'_' + item.value}>
-                                { this.props.subData 
-                                ? this.props.filters.arrayAirlinesName[index]                                        
-                                : this.props.handler(item.value)}
+                        <label className="g-text-overflow" htmlFor={this.props.checkBoxPrefix +'_' + item.value}>                                
+                                { this.props.checkBoxPrefix ==='stars' && item.value !== 0 && 
+                                    <span className = {`hotel-class hotel-class_${item.value}`}></span> 
+                                }
+                                { this.props.checkBoxPrefix ==='stars' && item.value === 0 && 
+                                    <span>Без звезд</span> 
+                                }                                
+                                { this.props.checkBoxPrefix !=='stars' && this.props.checkBoxPrefix !=='amenities' && 
+                                    <span>{item.value}</span> 
+                                } 
+                                { this.props.checkBoxPrefix === 'amenities' && 
+                                    <span>{hotelAmenitiesCheckbox(this.props.language, item.value)}</span> 
+                                }                                  
                         </label>                        
                         <div 
                             className="only-text"                           
@@ -85,8 +97,6 @@ class Checkbox extends Component {
                                 </button> 
                             }
                         </div>
-
-
                     </div>
                     ))                                
                 }
@@ -95,19 +105,16 @@ class Checkbox extends Component {
     }
 }
 
-Checkbox.propTypes = {
-    filters: PropTypes.object,
-    filterBuild: PropTypes.func,
-    changeFilters: PropTypes.func
-}
+
+// HotelCheckbox.propTypes = {
+
+// }
 
 const mapStateToProps = state => ({
-    filters: state.data.filters,
-    oneway: state.UI.oneway,
-    tickets: state.data.tickets,
-    combackDate: state.data.simpleFormParams.segments.combackDate
+    language: state.UI.language.toLowerCase()
+
 })
 
+const mapDispatchToProps = {changeHotelFilters}
 
-const mapDispatchToProps = {changeFilters}
-export default connect(mapStateToProps, mapDispatchToProps)(Checkbox)
+export default connect(mapStateToProps, mapDispatchToProps)(HotelCheckbox)

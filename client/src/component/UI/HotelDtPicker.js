@@ -9,57 +9,58 @@ import { subDays } from 'date-fns'
 import { formatDate } from '../../function/formatDate' 
 import { connect } from 'react-redux'
 // actions
-import { setDate, setCombackDate } from '../../redux/actions/dataActions'
+//import { setDate, setCombackDate } from '../../redux/actions/dataActions'
+import { setCheckInDate, setCheckOutDate } from '../../redux/actions/dataActions'
 //locale for datepicker
 registerLocale("ru", ru)
 
-class DtPicker extends Component {
+class HotelDtPicker extends Component {
 
-    constructor(props) {      
+    constructor(props) {
         super(props)
-        //this.setDate = this.setDate.bind(this)
         this.state = {
-            date: '',
             dateType: this.props.dateType,
             placeholderText: this.props.placeholderText,
-            dtVisible: this.props.dtVisible
+            date: ''
         }
-    } 
+    }
 
     componentDidMount(){   
 
+        //прибавляем к дате нужно количество дней
         function addDays(dateObj, numDays) {
             dateObj.setDate(dateObj.getDate() + numDays);
             return dateObj;
         }
         
         // если есть в localStorage
-        if(localStorage.hasOwnProperty('formData')){  
-            let formData = localStorage.getItem('formData')
-            var formDataObj = JSON.parse(formData) 
+        if(localStorage.hasOwnProperty('hotelData')){  
+            let hotelParams = localStorage.getItem('hotelData')
+            var hotelParamsObj = JSON.parse(hotelParams) 
             
-            if(formDataObj.date) {
-                var date = new Date(formDataObj.date).getTime()     
-                this.props.setDate(formDataObj.date)          
+            if(hotelParamsObj.checkInDate) {
+                var checkInDate = new Date(hotelParamsObj.checkInDate).getTime()     
+                this.props.setCheckInDate(hotelParamsObj.checkInDate)          
             }
 
-            if(formDataObj.combackDate) {
-                var combackDate = new Date(formDataObj.combackDate).getTime()
-                this.props.setCombackDate(formDataObj.combackDate)
+            if(hotelParamsObj.checkOutDate) {
+                var checkOutDate = new Date(hotelParamsObj.checkOutDate).getTime()
+                this.props.setCheckOutDate(hotelParamsObj.checkOutDate)
             }            
             
-            if(this.state.dateType === 'originDate') {
+            if(this.state.dateType === 'checkIn') {
                 this.setState({
-                    date: date
+                    date: checkInDate
                 })
                 
             } else {
                 this.setState({
-                    date: combackDate
+                    date: checkOutDate
                 })                
             }
         } else {
-            if(this.state.dateType === 'originDate') {
+            
+            if(this.state.dateType === 'checkIn') {
                 
                 // дата туда по умолчанию
                 this.setState({
@@ -78,7 +79,7 @@ class DtPicker extends Component {
                 }
                 const y = plus7days.getFullYear()   
                 const currentDate = `${y}-${m}-${d}`
-                this.props.setDate(currentDate)
+                this.props.setCheckInDate(currentDate)
                 // дата обратно по умолчанию
                 var d1 = plus17days.getDate()
                 if (d1 < 10) { 
@@ -90,7 +91,7 @@ class DtPicker extends Component {
                 }
                 const y1 = plus17days.getFullYear()   
                 const currentDateCompack = `${y1}-${m1}-${d1}`            
-                this.props.setCombackDate(currentDateCompack)
+                this.props.setcheckOutDate(currentDateCompack)
             } else {
                 this.setState({
                     date: new Date().setDate(new Date().getDate())+1000*60*60*24*17
@@ -104,16 +105,14 @@ class DtPicker extends Component {
             date: event
         })
        const fDate = formatDate(event)       
-       if(this.props.dateType === 'combackDate') {
-            this.props.setCombackDate(fDate)
+       if(this.props.dateType === 'checkOut') {
+            this.props.setCheckOutDate(fDate)
        } else {
-            this.props.setDate(fDate)
+            this.props.setCheckInDate(fDate)
        }       
     }
 
-    
-
-    render() {       
+    render() {
         return (
             <div>      
                 <DatePicker
@@ -125,25 +124,23 @@ class DtPicker extends Component {
                     minDate={subDays(new Date(), 0)}
                     onChange={date => this.setDate(date)} 
                     isClearable    
-                    placeholderText={this.state.placeholderText}  
-                    disabled={this.props.oneway}                    
+                    placeholderText={this.state.placeholderText}                                   
                 />                
             </div>
         )
     }
 }
 
-DtPicker.propTypes = {
-    setDate: propTypes.func.isRequired,
-    setCombackDate: propTypes.func.isRequired,
-    fDate: propTypes.string,
-    dtVisible: propTypes.bool.isRequired
+HotelDtPicker.propTypes = {
+    setCheckInDate: propTypes.func.isRequired,
+    setCheckOutDate: propTypes.func.isRequired,
+    fDate: propTypes.string    
 }
 
 const mapStateToProps = state => ({
-    UI: state.UI   
+    hotelParams: state.data.hotelParams
 })
 
-const mapDispatchToProps = { setDate, setCombackDate }
+const mapDispatchToProps = { setCheckInDate, setCheckOutDate }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DtPicker)
+export default connect(mapStateToProps, mapDispatchToProps)(HotelDtPicker)

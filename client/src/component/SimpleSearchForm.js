@@ -57,7 +57,7 @@ class SimpleSearchForm extends Component  {
     formSubmit = event => {       
         event.preventDefault()        
         this.props.preSimpleSearch()   
-        console.log(this.props.formData, this.props.passData)
+        //console.log(this.props.formData, this.props.passData)
         localStorage.setItem('formData', JSON.stringify(this.props.formData))
         localStorage.setItem('passData', JSON.stringify(this.props.passData))
     }

@@ -42,3 +42,30 @@ export const CHANGE_CURRENCY = 'CHANGE_CURRENCY'
 //видимость форма/инфо табло
 export const INFOBOARD_VISIBLE = 'INFOBOARD_VISIBLE'
 export const FORM_VISIBLE = 'FORM_VISIBLE'
+
+//***hotel block
+export const SET_ADULTS_DATA = 'SET_ADULTS_DATA'
+export const SET_CHILDREN_DATA = 'SET_CHILDREN_DATA'
+export const SET_CHECKIN_DATE = 'SET_CHECKIN_DATE'
+export const SET_CHECKOUT_DATE = 'SET_CHECKOUT_DATE'
+export const SET_PLACE_OR_HOTEL = 'SET_PLACE_OR_HOTEL'
+//продолжительность проживания
+export const LENGTH_OF_STAY = 'LENGTH_OF_STAY'
+export const LOADING_HOTEL_DATA = 'LOADING_HOTEL_DATA'
+export const HOTEL_SEARCH_ID_RECEIVED = 'HOTEL_SEARCH_ID_RECEIVED'
+export const SET_HOTEL_SEARCH_ID = 'SET_HOTEL_SEARCH_ID'
+export const HOTEL_FORM_VISIBLE = 'HOTEL_FORM_VISIBLE'
+export const HOTEL_INFOBOARD_VISIBLE = 'HOTEL_INFOBOARD_VISIBLE'
+export const SET_HOTEL_DATA = 'SET_HOTEL_DATA'
+export const SET_HOTEL_FILTERED_DATA = 'SET_HOTEL_FILTERED_DATA'
+export const HOTEL_RESULTS_IS_EMPTY = 'HOTEL_RESULTS_IS_EMPTY'
+// сообщение об ошибках заполнения формы поиска отелей
+export const ERROR_MESSAGE_HOTEL_SEARCH_FORM = 'ERROR_MESSAGE_HOTEL_SEARCH_FORM'
+//длина массива отелей
+export const SET_HOTELS_LENGTH = 'SET_HOTELS_LENGTH'
+// данные для фильтра
+export const SET_HOTEL_FILTER_DATA = 'SET_HOTEL_FILTER_DATA'
+// длина фильтрованного массива
+export const UPDATE_HOTEL_FILTERED_LENGTH = 'UPDATE_HOTEL_FILTERED_LENGTH'
+// статус поиска
+export const SEARCH_HOTEL_STATUS = 'SEARCH_HOTEL_STATUS'

@@ -6,7 +6,7 @@ const path = require('path')
 const app = express()
 app.use(cors())
 app.use(express.json({extended: true}))
-app.use('/aviasales', require('./routes/routes'))
+app.use('/api', require('./routes/routes'))
 
 if(process.env.NODE_ENV === "production") {
     app.use('/', express.static(path.join(__dirname, 'client', 'build')))

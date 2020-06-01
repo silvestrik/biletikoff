@@ -3,6 +3,10 @@
 export const translate = (word, lang) => {    
   
     const wordsObject = {
+        quick_flight_search: {
+            en: 'quick flight search',
+            ru: 'Быстрый поиск авиабилетов'
+        },
         one_way: {
             en: 'One way',
             ru: 'В одну сторону'
@@ -79,11 +83,7 @@ export const translate = (word, lang) => {
         update: {
             en: 'Update',
             ru: 'Обновить'
-        },
-        there: {
-            en: 'There',
-            ru: 'Туда'
-        },
+        },        
         change_time: {
             en: 'Change time',
             ru: 'Время пересадок'
@@ -249,6 +249,10 @@ export const translate = (word, lang) => {
     }
   
     var ln = lang.toLowerCase()
-    const translate = wordsObject[word][ln] 
-    return translate 
+
+    try {
+        return wordsObject[word][ln]
+    } catch (e) {
+        return word
+    }
 }

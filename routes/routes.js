@@ -2,6 +2,8 @@ const {Router} = require('express')
 const router = Router()
 const axios = require('axios')
 const md5 = require('md5')
+var token = '86d4ba7e94a304f5b4cc22c88eeb94df' 
+var marker = '21724'
 
 //курс вылют
 router.get('/currencies', async (request, response) => { 
@@ -52,17 +54,14 @@ router.post('/getInitialData', async (request, response) => {
         //добавить сравнение даты, что бы вылет не был позде возврата    
         } else if (toDate === null){
             response.status(400).json({message:'Выберите дату вылета'}) 
-        } else if (
-            toDate !=="" && 
-            toDate !== null &&
-            combackDate !=="" &&
+        } else if (           
+            combackDate &&
             combackDate !==null &&
             new Date(toDate.substr(0, 4), toDate.substr(5, 2), toDate.substr(-2)) > 
             new Date(combackDate.substr(0, 4), combackDate.substr(5, 2), combackDate.substr(-2)) ) {            
             response.status(400).json({message:'Дата возврата меньше даты вылета'})
         } else {
-            const token = '86d4ba7e94a304f5b4cc22c88eeb94df'
-            const marker = '21724'
+            // const marker = '21724'
             const ip = '163.172.146.130'
             const host = 'beta.aviasales.ru'
             const apiUrl = 'http://api.travelpayouts.com/v1/flight_search'
@@ -85,7 +84,7 @@ router.post('/getInitialData', async (request, response) => {
             const segment_1_sorted = Object.values(alphabeticSort(segment_1)) 
             const passengers_sorted = Object.values(alphabeticSort(passengers))         
             
-            if(combackDate !== '' && combackDate !== null) {
+            if(combackDate && combackDate !== null) {
                 // для получения searchId
                 var segments = [segment_0_sorted, segment_1_sorted]
                 //для поиска
@@ -184,6 +183,142 @@ router.post('/getBuyLink', async (request, response) => {
     } catch (error) {
         console.error(error)
     }
+})
+
+// hotel block
+router.get('/hotelAutocomplete/:term', async (request, response) =>{
+    const search = encodeURI (request.params.term) 
+    console.log(search)
+    try {    
+        const cityAndHotel = await axios.get(`http://engine.hotellook.com/api/v2/lookup.json?query=${search}&lang=ru&lookFor=both&limit=10&token=token`)    
+        response.json(cityAndHotel.data)  
+    } catch (error) {
+        console.error(error)
+    }
+})
+
+router.post('/getHotelInitialData', async (request, response) => {
+    try {
+        
+        const { id, checkInDate, checkOutDate, adults, children, currency, language, objectID } = request.body
+        if(id === "") {
+            response.status(400).json({message:'Выберите город или отель'}) 
+         } else if(checkInDate === null || checkInDate === "" ) {
+            response.status(400).json({message:'Не указана дата заезда'})
+         } else if(checkOutDate === null || checkOutDate === "") {
+            response.status(400).json({message:'Не указана дата выезда'})
+         } else if (
+            new Date(checkInDate.substr(0, 4), checkInDate.substr(5, 2), checkInDate.substr(-2)) > 
+            new Date(checkOutDate.substr(0, 4), checkOutDate.substr(5, 2), checkOutDate.substr(-2))
+        ) {
+            response.status(400).json({message:'Дата выезда меньше даты заезда'})
+        } else {        
+            //сигнатура поиска !! CUSTOMER IP использовать           
+            //массив деток
+            const childrenCount = children.length            
+            if(childrenCount===1) {
+                var childrenAgeObj = {childAge1: children[0]}
+            } else if (childrenCount===2){
+                var childrenAgeObj = {childAge1: children[0], childAge2: children[1]}
+            } else if (childrenCount===3){
+                var childrenAgeObj = {childAge1: children[0], childAge2: children[1], childAge3: children[2]}   
+            } else {
+                var childrenAgeObj=''
+            }            
+
+            // тип объекта запроса - город или отель
+            if(objectID === 'hotelId') {
+                var typeLocationObj = { hotelId: id}                
+            } else if (objectID ==='cityId') {
+                var typeLocationObj = {cityId: id}               
+            }             
+
+            const paramsObj = {                
+                checkIn: checkInDate,
+                checkOut: checkOutDate,
+                adultsCount: adults,
+                customerIP: '163.172.146.130',
+                childrenCount: childrenCount,               
+                lang: language.toLowerCase(),
+                currency: currency.toUpperCase(),
+                waitForResult: 0
+            }            
+
+            var resultObj = {}
+            var resultObj = { ...paramsObj, ...typeLocationObj, ...childrenAgeObj}
+
+            //вспомогательная функция для сортировки параметров
+            alphabeticSort = (data) => {
+                const sortedData = Object.keys(data)
+                        .sort()
+                        .reduce((acc, key) => ({
+                            ...acc, [key]: data[key]
+                        }), {})
+                return sortedData        
+            }           
+
+            const sorted_params = alphabeticSort(resultObj)
+            const requestTmp = Object.values(sorted_params).join(':')
+            const requestParams = requestTmp.replace(/,/g, ':')  
+            const signature =  md5(`${token}:${marker}:${requestParams}`) 
+           
+            const apiHotelUrl = 'http://engine.hotellook.com/api/v2/search/start.json?'            
+            const requestPreData = 
+                JSON.stringify(sorted_params)
+                .replace(/:/g, '=')
+                .replace(/"/g, '')
+                .replace(/,/g, '&')
+                .replace('{', '')
+                .replace('}', '') 
+          
+            // запрос на получение searchId
+                const requestUrl = `${apiHotelUrl}${requestPreData}&marker=${marker}&signature=${signature}`
+                //console.log(requestUrl)
+
+            const searchHotelIdData = await axios.post(requestUrl)
+                .then(response => {
+                    if(response.data.status === 'ok'){
+                        return response.data
+                    }      
+                })
+                .catch(err=> {
+                    console.log(err)
+                })
+
+                //возвращаем данные с searchId и вспомогательную информацию
+                if(searchHotelIdData) {
+                    response.json(searchHotelIdData)        
+                } else {
+                    response.status(500).json({message:'Видимо что то случилось...попробуйте позже'})
+                }
+
+        }  
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+
+//асинхронное получение результата
+router.post('/getHotelResult', async (request, response) => { 
+    
+    try {
+        const hotelSearchId = request.body.hotelSearchId
+        const apiHotelUrl = 'http://engine.hotellook.com/api/v2/search/getResult.json?'       
+        const signature = md5(`${token}:${marker}:${hotelSearchId}`)
+        const fullApiResultHotel = `${apiHotelUrl}searchId=${hotelSearchId}&marker=${marker}&signature=${signature}`       
+        
+        const result = await axios.get(fullApiResultHotel)
+            .then(response => {                
+                return response.data
+            })
+            .catch(err => {
+                console.log(err)
+            })
+            response.json(result)  
+        } catch (error) {
+            console.error(error)
+        }    
 })
 
 module.exports = router

@@ -10,6 +10,8 @@ import { changeLanguageAndCurrency } from '../../redux/actions/uiActions'
 import { getPrice } from '../../function/getPrice'
 // format language name
 import { formatLanguageName } from '../../function/formatData'
+//translate
+import { translate } from '../../function/translate'
 
 class Header extends Component {
 
@@ -39,35 +41,43 @@ class Header extends Component {
         }
     }
 
-    handlerChange = event => {
-        const name = event.target.name       
+    handlerChangeCurrency = event => {       
         const value = event.target.value
-        this.props.changeLanguageAndCurrency(name, value)
+        this.props.changeLanguageAndCurrency('currency', value)
+        this.setState({
+            currency: value
+        }) 
+        localStorage.setItem('userCurrency', JSON.stringify(value)) 
+    } 
 
-        if(name==="itemLanguage") {
-            this.setState({
-                language: value
-            })
-            localStorage.setItem('userLanguage', JSON.stringify(value))
-        } else {
-            this.setState({
-                currency: value
-            }) 
-            localStorage.setItem('userCurrency', JSON.stringify(value))           
-        }
+    handlerChangeLanguage = event => {       
+        const value = event.target.value
+        this.props.changeLanguageAndCurrency('language', value)
+
+        this.setState({
+            language: value
+        })
+        localStorage.setItem('userLanguage', JSON.stringify(value))
     } 
     
-    render() { 
+    render() {             
         return (
             <div style={{paddingTop: 20}}> 
-                <p className="logo__name">Biletikoff</p>
+                <a  href="/" className="logo">
+                    <span className="logo__name">
+                        Biletikoff
+                    </span>
+                    <span className="logo__desc">
+                        {translate('quick_flight_search', this.props.language) }                        
+                    </span>
+                </a>
                 <div className="col-md-12" style={{display: "flex", justifyContent: "flex-end", top: 10}}> 
                     <button 
                         className="btn btn-success btn-sm"                                
                         onClick={() => this.refs.modal.open() }
                     >
-                    {formatLanguageName(this.props.language)} <span className={'languageIcon c-'+this.props.language.toLowerCase()}></span> 
-                    {getPrice(0, this.props.currency).replace('0', '')} {this.props.currency.toUpperCase()}
+                    {formatLanguageName(this.state.language)} <span className={'languageIcon c-'+this.state.language.toLowerCase()}></span> 
+                    {getPrice(0, this.state.currency).replace('0', '')} {this.state.currency.toUpperCase()}
                     </button>                    
                     <PureModal                                    
                         onClose={()=> {
@@ -75,36 +85,34 @@ class Header extends Component {
                         }}
                         ref="modal"
                         width="300px"
-                    >                    
+                    >                     
                     <div className="form-group">
                         <label htmlFor="itemLanguage">Язык</label>
                         <select 
-                        className="form-control" 
-                        name="itemLanguage" 
-                        onChange={this.handlerChange}
-                        //defaultValue={this.props.currency}
+                            className="form-control" 
+                            name="itemLanguage" 
+                            value={this.state.language}
+                            onChange={this.handlerChangeLanguage}                            
                         >
                             <option value="RU">Русский</option>
-                            <option value="EN">English</option>
-                            {/* <option value="DE">Deutsch</option>
-                            <option value="ES">Español</option>                                             */}
+                            <option value="EN">English</option>                           
                         </select>
-                    </div> 
-                    {this.props.currencies && this.props.ticketsLength >0 &&
+                    </div>
+                    {this.props.currencies && 
                         <div className="form-group">
                             <label htmlFor="classPassanger">Валюта</label>
                             <select className="form-control" 
-                            name="itemCurrency" 
-                            onChange={this.handlerChange}
-                            //defaultValue={this.state.language}
-                            >
-                            { this.props.currencies.map((item, index) => (
-                                <option key={index} value={item}>{getPrice(0, item).replace('0', '')} {item.toUpperCase()}</option>  
-                                )) 
-                            }                                                                 
+                                name="itemCurrency" 
+                                value={this.state.currency}
+                                onChange={this.handlerChangeCurrency} 
+                                >
+                                { this.props.currencies.map((item, index) => (
+                                    <option key={index} value={item}>{getPrice(0, item).replace('0', '')} {item.toUpperCase()}</option>  
+                                    )) 
+                                }                                                                 
                             </select>
                         </div>
-                    }                    
+                    }                                       
                     </PureModal>
                     </div>
             </div>

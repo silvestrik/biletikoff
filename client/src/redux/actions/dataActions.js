@@ -26,7 +26,26 @@ import {
         ERROR_MESSAGE_SEARCH_FORM,
         SEARCH_ID_RECEIVED,     
         FORM_VISIBLE,
-        INFOBOARD_VISIBLE 
+        INFOBOARD_VISIBLE, 
+        SET_ADULTS_DATA,
+        SET_CHILDREN_DATA,
+        SET_CHECKIN_DATE,
+        SET_CHECKOUT_DATE,
+        SET_PLACE_OR_HOTEL,
+        LOADING_HOTEL_DATA,
+        HOTEL_SEARCH_ID_RECEIVED,
+        HOTEL_FORM_VISIBLE,
+        HOTEL_INFOBOARD_VISIBLE,
+        SET_HOTEL_SEARCH_ID,
+        SET_HOTEL_DATA,
+        HOTEL_RESULTS_IS_EMPTY,
+        ERROR_MESSAGE_HOTEL_SEARCH_FORM,
+        SET_HOTELS_LENGTH,
+        SET_HOTEL_FILTER_DATA,
+        SET_HOTEL_FILTERED_DATA,
+        UPDATE_HOTEL_FILTERED_LENGTH,
+        LENGTH_OF_STAY,
+        SEARCH_HOTEL_STATUS
     } from '../type'
 
 import store from  '../store' 
@@ -34,6 +53,23 @@ import { getAutocomplete } from '../../function/autocomplete'
 import { createTickets } from '../../function/createTickets'
 import { createFilters } from '../../function/createFilters'
 import { sortByPrice, setCheapestTicket, setFastestTicket } from '../../function/sortByPriceCheapFast'
+import { createHotelFilters } from '../../function/createHotelFilters'
+import { sortHotels } from '../../function/sortHotels'
+
+//получаем курсы валют
+export const getCurrencyRate = () => dispatch => {
+    axios.get('/api/currencies')
+        .then(response => {
+            dispatch({
+                type: FETCH_CURRENCIES,
+                payload: response.data
+            }) 
+        })
+        .catch(err => {
+            console.log('Error fetching currence rate')
+        })
+}
+
 
 //GeoIP city
 export const geoIp = () => (dispatch) => {
@@ -41,7 +77,7 @@ export const geoIp = () => (dispatch) => {
     axios.get("http://ip-api.com/json")
     .then(response => {        
         let ip = response.data.query || '161.185.160.93'       
-            axios.get(`/aviasales/geoip/${ip}`)
+            axios.get(`/api/geoip/${ip}`)
                 .then( response => {
                     dispatch({
                         type: UPDATE_GEOIP,
@@ -177,14 +213,14 @@ export const preSimpleSearch = () => dispatch => {
 
     //localStorage.setItem('lastFrmData', JSON.stringify(origin, destination, toDate, combackDate, tripClass, adults, child, baby))
 
-    axios.post('/aviasales/getInitialData', {origin, destination, toDate, combackDate, tripClass, adults, child, baby})
+    axios.post('/api/getInitialData', {origin, destination, toDate, combackDate, tripClass, adults, child, baby})
         .then(response => {
             dispatch({ type: ERROR_MESSAGE_SEARCH_FORM, payload: '' })
-            const currency_rates = response.data.currency_rates
-            dispatch({
-                type: FETCH_CURRENCIES,
-                payload: currency_rates
-            })    
+            // const currency_rates = response.data.currency_rates
+            // dispatch({
+            //     type: FETCH_CURRENCIES,
+            //     payload: currency_rates
+            // })    
             dispatch({
                 type: SEARCH_STATUS,
                 payload: true
@@ -194,7 +230,7 @@ export const preSimpleSearch = () => dispatch => {
                type: SET_SEARCH_ID,
                payload: search_id
             })
-            if(search_id) {                
+            if(search_id) {
                                 
                 const current_time = new Date()                    
                 dispatch({ type: SEARCH_ID_RECEIVED, payload: current_time })
@@ -217,7 +253,7 @@ export const preSimpleSearch = () => dispatch => {
                 const getAsyncResult = (search_id) => {                                       
                     step++
                     if(step<7) {
-                        axios.post( '/aviasales/getResult', {search_id})                        
+                        axios.post( '/api/getResult', {search_id})                        
                         .then(response => {                             
                             const proposals = response.data
 
@@ -312,6 +348,7 @@ export const changeFilters = (name, onlyChecked) => dispatch => {
     var payTypes = store.getState().data.filters.payTypes 
     var baggage = store.getState().data.filters.baggage 
     var handbags = store.getState().data.filters.handbags 
+    
 
     // применение фильтра по пересадкам
     if(name.includes("stops") === true) {
@@ -653,7 +690,7 @@ export const filterChangeArrDepTime = (type, fromTime, toTime) => dispatch => {
 
 export const getBuyLink = (link, search_id) => dispatch =>{        
     if(search_id !=='') {
-        const result = axios.post('/aviasales/getBuyLink', {search_id, link})            
+        const result = axios.post('/api/getBuyLink', {search_id, link})            
             return result
     } else {
         console.log('search_id is empty')
@@ -670,8 +707,368 @@ export const toggleForm = data => dispatch => {
 
 // TODO
 // 10. Сбросить все фильтры (сверху блока фильтров, появляется если выбран хоть один фильтр)
-// 12. Скелетоны билетов
 // заменить "показать далее" на автоподгрузку
 // слайдер цены
+//ошибки в консоли???
+// !!!! крутилку на фоне кнопки "ВВЕРХ"
 
-// !!!!!!!! отключить инструменты разработчика REDUX
+
+
+
+/** Hotel actions */
+
+//set adult 
+export const setAdultData = data => dispatch => {
+    dispatch ({
+        type: SET_ADULTS_DATA,
+        payload: data
+    })
+}
+
+//set children
+export const setChildrenData = data => dispatch => {
+    dispatch({
+        type: SET_CHILDREN_DATA,
+        payload: data
+    })
+}
+
+//дата заезда
+export const setCheckInDate = (data) => dispatch => {    
+    dispatch({
+        type: SET_CHECKIN_DATE,
+        payload: data
+    })
+}
+
+//дата выезда
+export const setCheckOutDate = (data) => dispatch => {
+    dispatch({
+        type: SET_CHECKOUT_DATE,
+        payload: data
+    })
+}
+
+export const autocompletePlaceOrHotel = (data) => dispatch => {       
+    dispatch({
+        type: SET_PLACE_OR_HOTEL,
+        payload: data
+    })
+}
+
+//переключение видимости форма-инфотабло
+export const hotelToggleForm = data => dispatch => {
+    dispatch({
+        type: HOTEL_FORM_VISIBLE,
+        payload: data
+    })
+}
+
+// search_id
+export const preHotelSearch = data => dispatch => {
+    const tmpData = store.getState().data.hotelParams.formData
+
+    if(tmpData.cityOrHotelData.label) {
+        // eslint-disable-next-line
+        var id = tmpData.cityOrHotelData.id
+        // eslint-disable-next-line
+        var objectID = 'hotelId'
+    } else if (tmpData.cityOrHotelData.hotelsCount) {
+        // eslint-disable-next-line
+        var id = tmpData.cityOrHotelData.id
+        // eslint-disable-next-line
+        var objectID = 'cityId'
+    }
+    
+    const date1 = new Date(tmpData.checkInDate);
+    const date2 = new Date(tmpData.checkOutDate)
+    const lengthOfStay = Math.ceil(Math.abs(date2.getTime() - date1.getTime()) / (1000 * 3600 * 24))
+    dispatch({
+        type: LENGTH_OF_STAY,
+        payload:lengthOfStay
+    })    
+
+dispatch({ type: HOTEL_RESULTS_IS_EMPTY, payload: false }) 
+
+    const checkInDate = tmpData.checkInDate
+    const checkOutDate = tmpData.checkOutDate
+    const adults = tmpData.adults
+    const children = tmpData.children    
+    const currency = store.getState().UI.currency
+    const language = store.getState().UI.language
+
+    dispatch({ type: LOADING_HOTEL_DATA, payload: true })   
+    
+    axios.post('/api/getHotelInitialData', {id, checkInDate, checkOutDate, adults, children, currency, language, objectID})
+        .then(response => {
+            dispatch({ type: ERROR_MESSAGE_HOTEL_SEARCH_FORM, payload: '' })
+            const hotelSearchId = response.data.searchId
+            //console.log(hotelSearchId)
+        if(hotelSearchId) {
+                //searchId->store     
+                dispatch({ type: SET_HOTEL_SEARCH_ID, payload: hotelSearchId })
+                //время получения
+                const current_time = new Date()                    
+                dispatch({ type: HOTEL_SEARCH_ID_RECEIVED, payload: current_time })                
+                //показываем табло с данными о бронировании
+                dispatch({ type: HOTEL_FORM_VISIBLE, payload: false })
+                //скрываем форму
+                dispatch({ type: HOTEL_INFOBOARD_VISIBLE, payload: true })                
+                // запускаем таймер обратного отсчета времени и стираем searchId/ напоминаем об обновлении   
+                setTimeout(() => {
+                    dispatch({
+                        type: SET_HOTEL_SEARCH_ID,
+                        payload: ''
+                        })                    
+                }, 600000)
+                //обнуляем массивы с отелями, длины
+                dispatch({ type: SET_HOTEL_DATA, payload: '' }) 
+                dispatch({type: SET_HOTEL_FILTERED_DATA, payload: ''})
+                dispatch({ type: SET_HOTELS_LENGTH, payload: 0 })  
+                dispatch({ type: UPDATE_HOTEL_FILTERED_LENGTH, payload: 0 })
+                dispatch({ type: SEARCH_HOTEL_STATUS, payload: true })
+
+            var hotelStep = 0
+            //const hotelResults = [] 
+            
+            const getAsyncHotelResult = hotelSearchId => { 
+                hotelStep ++      
+                if(hotelStep < 15) {
+                    axios.post('/api/getHotelResult', {hotelSearchId})
+                    .then(response => {
+                        const hotelProprosals = response.data.result
+                        //console.log(hotelProprosals) 
+                        // hotelResults.push(hotelProprosals.result)                        
+                        if( response.data.status ==='ok') {
+                            hotelStep=15 
+                            
+                            //массив с отелями
+                            dispatch({ type: SET_HOTEL_DATA, payload: hotelProprosals })
+                            // записывам общее число предложений
+                            dispatch({ type: SET_HOTELS_LENGTH, payload: hotelProprosals.length }) 
+                            
+                            // делаем копию основого массива для дальнейших манипуляций 
+                            var hotelFiltered = hotelProprosals
+                            //console.log('hotelFiltered', hotelFiltered)
+
+                            // вспомогательная функция, базовая сортировка по цене
+                            const hotels = sortHotels(hotelProprosals, 'rating')
+
+                            dispatch({type: SET_HOTEL_FILTERED_DATA, payload: hotels})
+                            //обновляем длину отфильтрованного массива
+                            dispatch({ type: UPDATE_HOTEL_FILTERED_LENGTH, payload: hotelFiltered.length })                                                       
+                            
+                            // создаем массив фильтров
+                            var hotelFilters = createHotelFilters(hotelProprosals)
+                            //console.log(hotelFilters)
+                            dispatch({ type: SET_HOTEL_FILTER_DATA, payload: hotelFilters }) 
+
+                            // скрываем загрузку
+                            dispatch({ type: LOADING_HOTEL_DATA, payload: false})
+                            // статус поиска отелей
+                            dispatch({ type: SEARCH_HOTEL_STATUS, payload: false })
+
+                        }                                               
+                        // пауза при запросе
+                        setTimeout(() => {
+                            getAsyncHotelResult(hotelSearchId)
+                        }, 5000) 
+                    })  
+                    .catch(error => {
+                        console.log(error)
+                    })     
+                } else {
+                    //console.log('Search Hotel is finished') 
+                    dispatch({ type: LOADING_HOTEL_DATA, payload: false})
+                    dispatch({ type: SEARCH_HOTEL_STATUS, payload: false })
+                    // если предложений по отелям нет
+                    const hotelProposalsLength = store.getState().data.hotelParams.hotelData.length
+                    if(hotelProposalsLength===0) {
+                        dispatch({ type: HOTEL_RESULTS_IS_EMPTY, payload: true }) 
+                    }
+                }
+            }
+            getAsyncHotelResult(hotelSearchId)  
+        }
+        })
+        .catch(err => {
+            dispatch({type: LOADING_HOTEL_DATA, payload: false})
+            dispatch({ type: ERROR_MESSAGE_HOTEL_SEARCH_FORM, payload: err.response.data.message })
+        })
+}
+
+//change filters
+
+export const changeHotelFilters = (name, onlyChecked) => dispatch => {     
+    const hotelData = store.getState().data.hotelParams.hotelData
+    const hotelDataFiltered = Object.assign([], hotelData)
+
+    var stars = store.getState().data.hotelParams.hotelFilters.stars
+    var amenities = store.getState().data.hotelParams.hotelFilters.amenities
+    var agencies = store.getState().data.hotelParams.hotelFilters.agencies   
+
+    if(name.includes('stars') === true) {
+        
+        let starItem = parseInt(name.replace('stars_', ''), 10)
+
+        if(onlyChecked === 'all') {
+            stars.forEach(item => {
+                item.status = true
+            })
+        } else if(onlyChecked === false) {
+            stars.forEach(item => {
+                if(item.value === starItem) {
+                    item.status = !item.status                   
+                } 
+            })
+        } else if(onlyChecked === true){
+            stars.forEach(item => {
+                if(item.value === starItem && item.status === false) {
+                    item.status = !item.status 
+                } else if(item.value !== starItem && item.status === true) {
+                    item.status = !item.status 
+                }
+            })
+        }
+
+        for(var s=hotelDataFiltered.length-1; s>=0; s--){   
+            var remove = true     
+            for(var i=0; i<stars.length; i++) {                     
+                if(stars[i].value === hotelDataFiltered[s].stars && stars[i].status===true) {
+                    remove = false
+                    break                    
+                }             
+            }
+            if ( remove ) {
+                hotelDataFiltered.splice(s , 1)
+            }
+        }
+
+        dispatch({ type: SET_HOTEL_FILTERED_DATA, payload: hotelDataFiltered })       
+        dispatch({ type: UPDATE_HOTEL_FILTERED_LENGTH, payload: hotelDataFiltered.length }) 
+
+    } else if (name.includes('amenities') === true) {
+        let amenitiesItem = parseInt(name.replace('amenities_', ''), 10)
+        
+
+        if(onlyChecked === 'all') {
+            amenities.forEach(item => {
+                item.status = true
+            })
+        } else if(onlyChecked === false) {
+            amenities.forEach(item => {
+                if(item.value === amenitiesItem) {
+                    item.status = !item.status                   
+                } 
+            })
+        } else if(onlyChecked === true){
+            amenities.forEach(item => {
+                if(item.value === amenitiesItem && item.status === false) {
+                    item.status = !item.status 
+                } else if(item.value !== amenitiesItem && item.status === true) {
+                    item.status = !item.status 
+                }
+            })
+        }        
+
+        for(var s12=hotelDataFiltered.length-1; s12>=0; s12--){             
+                var remove3 = true                    
+                for(var i9=0; i9<amenities.length; i9++) { 
+                    if(hotelDataFiltered[s12].amenities.includes(amenities[i9].value)===true && amenities[i9].status === true) { 
+                        remove3 = false
+                        break
+                    }
+                }
+           
+            if ( remove3 ) {
+                hotelDataFiltered.splice(s12 , 1)                    
+            }            
+        }
+
+        dispatch({ type: SET_HOTEL_FILTERED_DATA, payload: hotelDataFiltered })       
+        dispatch({ type: UPDATE_HOTEL_FILTERED_LENGTH, payload: hotelDataFiltered.length })   
+    }  else if (name.includes('agencies') === true) { 
+
+
+        let agenciesItem = name.replace('agencies_', '')
+        
+
+        if(onlyChecked === 'all') {
+            agencies.forEach(item => {
+                item.status = true
+            })
+        } else if(onlyChecked === false) {
+            agencies.forEach(item => {
+                if(item.value === agenciesItem) {
+                    item.status = !item.status                   
+                } 
+            })
+        } else if(onlyChecked === true){
+            agencies.forEach(item => {
+                if(item.value === agenciesItem && item.status === false) {
+                    item.status = !item.status 
+                } else if(item.value !== agenciesItem && item.status === true) {
+                    item.status = !item.status 
+                }
+            })
+        }
+
+        for(var s13=hotelDataFiltered.length-1; s13>=0; s13--){  
+            for(var j in hotelDataFiltered[s13].rooms) { 
+                var remove4 = true    
+                for(var i19=0; i19<agencies.length; i19++) {
+                    if(hotelDataFiltered[s13].rooms[j].agencyName.includes(agencies[i19].value)===true && agencies[i19].status === true) {                    
+                        remove4 = false
+                        break
+                    }
+                }
+            }
+            if ( remove4 ) {
+                hotelDataFiltered.splice(s13 , 1)                    
+            }            
+        }      
+
+        dispatch({ type: SET_HOTEL_FILTERED_DATA, payload: hotelDataFiltered })       
+        dispatch({ type: UPDATE_HOTEL_FILTERED_LENGTH, payload: hotelDataFiltered.length }) 
+    }
+}
+
+export const filterHotelSlider = (sliderValues1, sliderValues2, code) => dispatch => {
+    console.log(sliderValues1, sliderValues2, code)
+   
+    const hotelData = store.getState().data.hotelParams.hotelData
+    const hotelDataFiltered = Object.assign([], hotelData)
+
+    if(code==="sliderPrice" && hotelDataFiltered.length>0) {        
+        for(var i=hotelDataFiltered.length-1; i>=0; i--) {
+            if ((hotelDataFiltered[i].minPriceTotal < sliderValues1) || (hotelDataFiltered[i].maxPrice > sliderValues2)) {
+                hotelDataFiltered.splice(i, 1)              
+            }           
+        }
+    } else if(code==="sliderDistance" && hotelDataFiltered.length>0) {        
+        for(var i2=hotelDataFiltered.length-1; i2>=0; i2--) {
+            if ((hotelDataFiltered[i2].distance < sliderValues1) || (hotelDataFiltered[i2].distance > sliderValues2)) {
+                hotelDataFiltered.splice(i, 1)              
+            }           
+        }
+    } else if(code==="sliderRating" && hotelDataFiltered.length>0) {        
+        for(var i3=hotelDataFiltered.length-1; i3>=0; i3--) {
+            if ((hotelDataFiltered[i3].rating/10 < sliderValues1) || (hotelDataFiltered[i3].rating/10 > sliderValues2)) {
+                hotelDataFiltered.splice(i, 1)              
+            }           
+        }
+    }
+
+    dispatch({ type: SET_HOTEL_FILTERED_DATA, payload: hotelDataFiltered })       
+    dispatch({ type: UPDATE_HOTEL_FILTERED_LENGTH, payload: hotelDataFiltered.length })
+}
+
+//пользовательская сортировка
+export const hotelSort = sortType => dispatch => {
+    
+    const hotelData = store.getState().data.hotelParams.hotelData
+    const hotelDataFiltered = Object.assign([], hotelData)   
+    
+    const hotelSortedData = sortHotels(hotelDataFiltered, sortType)
+    dispatch({ type: SET_HOTEL_FILTERED_DATA, payload: hotelSortedData })     
+}
