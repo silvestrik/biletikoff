@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import propTypes from 'prop-types'
-import { autocompleteOrigin, autocompleteDestination } from '../../redux/actions/dataActions' 
+import { autocompleteOrigin, autocompleteDestination, autocompletePlaceOrHotel } from '../../redux/actions/dataActions' 
 import { getAutocomplete } from '../../function/autocomplete'
+//автокомплит данных для поиска отелей
+import { getHotelAutocomplete } from '../../function/hotelAutocomplete'
 
 class InputAutocomplete extends Component {
 
@@ -63,6 +65,40 @@ class InputAutocomplete extends Component {
             this.props.autocompleteOrigin(JSON.parse(`${cityData}`)) 
         } else if(this.props.cityType === 'destination') {           
             this.props.autocompleteDestination(JSON.parse(`${cityData}`))
+
+            const cityDapartureIata = JSON.parse(`${cityData}`).code
+            //устанавливаем данные для поиска отелей
+            //console.log('JSON.parse(`${cityData}`', JSON.parse(`${cityData}`))
+
+
+
+
+            getHotelAutocomplete(cityDapartureIata)
+            .then( response => { 
+                const cityData = response.data.results.locations
+                //console.log(cityData) 
+                cityData.map(item => {
+                    if(item.iata.includes(cityDapartureIata) === true){
+                        //localStorage.setItem('formData', JSON.stringify(this.props.formData))
+                        //localStorage.setItem('passData', JSON.stringify(this.props.passData)) 
+                        //localStorage.setItem('aviaHotel', JSON.stringify(item)) 
+                        this.props.autocompletePlaceOrHotel(item)
+                        //console.log(item)
+                    }
+                   
+                })
+                
+            })   
+            .catch(error => {
+                console.log(error)
+            }) 
+
+
+
+
+
+
+
         }    
     }
 
@@ -167,5 +203,5 @@ const mapStateToProps = state => ({
     UI: state.UI
 })
 
-const mapDispatchToProps = { autocompleteOrigin, autocompleteDestination }
+const mapDispatchToProps = { autocompleteOrigin, autocompleteDestination, autocompletePlaceOrHotel }
 export default connect(mapStateToProps, mapDispatchToProps)(InputAutocomplete)

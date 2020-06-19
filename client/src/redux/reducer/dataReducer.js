@@ -39,7 +39,9 @@ import {
     SET_HOTEL_FILTERED_DATA,
     UPDATE_HOTEL_FILTERED_LENGTH,
     LENGTH_OF_STAY,
-    SEARCH_HOTEL_STATUS
+    SEARCH_HOTEL_STATUS,
+    AVIA_HOTEL_FORM_VISIBLE,
+    AVIA_HOTEL_INFOBOARD_VISIBLE
 } from "../type"
 
 const initialState = {
@@ -119,7 +121,11 @@ const initialState = {
             hotelDistanse: []
         },
         searchHotelStatus: false
-    }    
+    }, 
+    // avia-hotel params
+    aviaHotelInfoboardVisible: false,  
+    aviaHotelFormVisible: true     
+
 }
 
 export default function (state = initialState, action) { 
@@ -497,8 +503,22 @@ export default function (state = initialState, action) {
             }
         }
 
-      
-
+        //*****avia-hotel
+     
+        // скрыть основную форму
+        case AVIA_HOTEL_FORM_VISIBLE: {
+            return {
+                ...state,
+                aviaHotelFormVisible: action.payload
+            }
+        }    
+         // показать инфобокс
+        case AVIA_HOTEL_INFOBOARD_VISIBLE: {
+            return {
+                ...state,
+                aviaHotelInfoboardVisible: action.payload
+            }
+        } 
         default: return state 
     }        
 }

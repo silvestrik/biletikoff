@@ -91,7 +91,7 @@ class HotelDtPicker extends Component {
                 }
                 const y1 = plus17days.getFullYear()   
                 const currentDateCompack = `${y1}-${m1}-${d1}`            
-                this.props.setcheckOutDate(currentDateCompack)
+                this.props.setCheckOutDate(currentDateCompack)                
             } else {
                 this.setState({
                     date: new Date().setDate(new Date().getDate())+1000*60*60*24*17
@@ -133,7 +133,7 @@ class HotelDtPicker extends Component {
 
 HotelDtPicker.propTypes = {
     setCheckInDate: propTypes.func.isRequired,
-    setCheckOutDate: propTypes.func.isRequired,
+    setCheckOutDate: propTypes.func,
     fDate: propTypes.string    
 }
 

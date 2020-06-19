@@ -9,7 +9,7 @@ import { subDays } from 'date-fns'
 import { formatDate } from '../../function/formatDate' 
 import { connect } from 'react-redux'
 // actions
-import { setDate, setCombackDate } from '../../redux/actions/dataActions'
+import { setDate, setCombackDate, setCheckInDate, setCheckOutDate } from '../../redux/actions/dataActions'
 //locale for datepicker
 registerLocale("ru", ru)
 
@@ -40,12 +40,16 @@ class DtPicker extends Component {
             
             if(formDataObj.date) {
                 var date = new Date(formDataObj.date).getTime()     
-                this.props.setDate(formDataObj.date)          
+                this.props.setDate(formDataObj.date)  
+                //Автоподстановка даты заезда для отелей
+                this.props.setCheckInDate(formDataObj.date)        
             }
 
             if(formDataObj.combackDate) {
                 var combackDate = new Date(formDataObj.combackDate).getTime()
                 this.props.setCombackDate(formDataObj.combackDate)
+                //Автоподстановка даты выезда для отелей
+                this.props.setCheckOutDate(formDataObj.combackDate)
             }            
             
             if(this.state.dateType === 'originDate') {
@@ -67,7 +71,7 @@ class DtPicker extends Component {
                 }) 
     
                 var plus7days = addDays(new Date(), 7)
-                var plus17days = addDays(new Date(), 10)
+                var plus17days = addDays(new Date(), 17)
                 var d = plus7days.getDate()
                 if (d < 10) { 
                     d = "0" + d; 
@@ -79,7 +83,12 @@ class DtPicker extends Component {
                 const y = plus7days.getFullYear()   
                 const currentDate = `${y}-${m}-${d}`
                 this.props.setDate(currentDate)
+                //для отелей
+                //this.props.setCheckInDate(currentDate)  
                 // дата обратно по умолчанию
+
+                //console.log('this.props.setCheckInDate(currentDate)', currentDate)
+
                 var d1 = plus17days.getDate()
                 if (d1 < 10) { 
                     d1 = "0" + d1; 
@@ -90,7 +99,16 @@ class DtPicker extends Component {
                 }
                 const y1 = plus17days.getFullYear()   
                 const currentDateCompack = `${y1}-${m1}-${d1}`            
+                
+                
                 this.props.setCombackDate(currentDateCompack)
+               
+                //для отелей 
+                this.props.setCheckOutDate(currentDateCompack)
+
+                console.log('this.props.setCheckOutDate(currentDateCompack)', currentDateCompack)
+
+
             } else {
                 this.setState({
                     date: new Date().setDate(new Date().getDate())+1000*60*60*24*17
@@ -106,8 +124,12 @@ class DtPicker extends Component {
        const fDate = formatDate(event)       
        if(this.props.dateType === 'combackDate') {
             this.props.setCombackDate(fDate)
+            //для отелей 
+            this.props.setCheckOutDate(fDate)
        } else {
             this.props.setDate(fDate)
+            //для отелей
+            this.props.setCheckInDate(fDate)  
        }       
     }
 
@@ -144,6 +166,6 @@ const mapStateToProps = state => ({
     UI: state.UI   
 })
 
-const mapDispatchToProps = { setDate, setCombackDate }
+const mapDispatchToProps = { setDate, setCombackDate, setCheckInDate, setCheckOutDate }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DtPicker)

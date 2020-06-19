@@ -7,6 +7,7 @@ import AviaContainer from '../container/AviaContainer'
 //отели - контейнер с формой поиска и результами
 import HotelContainer from '../container/HotelContainer'
 import { getCurrencyRate } from '../redux/actions/dataActions'
+import AviaHotelContainer from '../container/AviaHotelContainer'
 
 
 class  Search extends Component {    
@@ -15,22 +16,18 @@ class  Search extends Component {
         this.state = {          
             proposalsLength: 0,
             loading: false,            
-            allChecked: true,
-            // tabAvia: {
-            //     style: {background: '#036', color: '#fff'},
-            //     showIndex: {display: 'block'}
-            // },
-            // tabHotel: {
-            //     style: {background: '#fff', color: '#036'},
-            //     showIndex: {display: 'none'}
-            // }
-            tabHotel: {
+            allChecked: true,   
+            tabAvia: {
                 style: {background: '#036', color: '#fff'},
                 showIndex: {display: 'block'}
-            },
-            tabAvia: {
+            },         
+            tabHotel: {
                 style: {background: '#fff', color: '#036'},
                 showIndex: {display: 'none'}
+            },            
+            tabHotelPlusAvia: {       
+                style: {background: '#fff', color: '#036'},
+                showIndex: {display: 'none'} 
             }
         } 
     } 
@@ -50,20 +47,43 @@ class  Search extends Component {
                 tabHotel: {
                     style: {background: '#fff', color: '#036'},
                     showIndex: {display: 'none'}
-                }
-            })
-        } else {
-            this.setState({
-                tabHotel: {
-                    style: {background: '#036', color: '#fff'},
-                    showIndex: {display: 'block'}
                 },
-                tabAvia: {
+                tabHotelPlusAvia: {
                     style: {background: '#fff', color: '#036'},
                     showIndex: {display: 'none'}
                 }
             })
-        } 
+        } else if(name==='hotel') {
+            this.setState({ 
+                tabAvia: {
+                    style: {background: '#fff', color: '#036'},
+                    showIndex: {display: 'none'}
+                },
+                tabHotel: {
+                    style: {background: '#036', color: '#fff'},
+                    showIndex: {display: 'block'}
+                },
+                tabHotelPlusAvia: {
+                    style: {background: '#fff', color: '#036'},
+                    showIndex: {display: 'none'}
+                }
+            })
+        } else if(name==='aviaPlushotel') {
+            this.setState({
+                tabAvia: {
+                    style: {background: '#fff', color: '#036'},
+                    showIndex: {display: 'none'}
+                },
+                tabHotel: {
+                    style: {background: '#fff', color: '#036'},
+                    showIndex: {display: 'none'}
+                },
+                tabHotelPlusAvia: {
+                    style: {background: '#036', color: '#fff'},
+                    showIndex: {display: 'block'}
+                }
+            })
+        }
     } 
 
     render () {  
@@ -89,6 +109,13 @@ class  Search extends Component {
                             >
                             Отели
                         </span>
+                        {/* <span 
+                            className="nav-item nav-link"  
+                            style={this.state.tabHotelPlusAvia.style}
+                            onClick={e => this.handlerTab(e, 'aviaPlushotel')}
+                            >
+                            Авиа + отель
+                        </span> */}
                     </div>
                 </nav>
                 <div>
@@ -97,6 +124,9 @@ class  Search extends Component {
                     </div>
                     <div style = {this.state.tabHotel.showIndex}>
                         <HotelContainer/> 
+                    </div>
+                    <div style = {this.state.tabHotelPlusAvia.showIndex}>
+                        <AviaHotelContainer/>
                     </div>
                 </div>                
                                

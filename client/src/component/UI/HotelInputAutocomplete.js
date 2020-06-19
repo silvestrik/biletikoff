@@ -10,6 +10,7 @@ class HotelnputAutocomplete extends Component {
         super(props)       
         this.state = {      
             cityData: [],
+            cityIata: '',
             label: this.props.label,       
             activeCity: 0,         
             showCityList: false,
@@ -27,7 +28,22 @@ class HotelnputAutocomplete extends Component {
                 userInput: cityDataStorage.cityName ? cityDataStorage.cityName : cityDataStorage.label
             })
             this.props.autocompletePlaceOrHotel(cityDataStorage)
-        }
+        }        
+    }
+
+
+    componentDidUpdate(prevProps) {         
+
+        if (this.props.data.formData.cityOrHotelData.iata) {
+            
+            if(this.props.data.formData.cityOrHotelData.iata[0] !== this.state.cityIata) { 
+                console.log('this.props.data', this.props.data.formData.cityOrHotelData.iata[0])
+                console.log('this.state.cityIata', this.state.cityIata)
+                // this.setState({
+                //     userInput: this.props.data.formData.cityOrHotelData.cityName ? this.props.data.formData.cityOrHotelData.cityName : this.props.data.formData.cityOrHotelData.label
+                // })                
+            }
+        } 
     }
   
     // выбор всего в поле    

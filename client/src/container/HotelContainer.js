@@ -60,9 +60,7 @@ class HotelContainer extends Component {
                                         , { this.props.formData.children.length } детей.
                                     </span>   
                                     } 
-
                                 </span>
-
                                 { this.props.hotelParams.loadingHotel &&
                                     <span className="smSpinerContainer">
                                         <div className="spinner-border" role="status">

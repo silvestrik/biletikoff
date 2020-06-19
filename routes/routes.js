@@ -228,10 +228,12 @@ router.post('/getHotelInitialData', async (request, response) => {
 
             // тип объекта запроса - город или отель
             if(objectID === 'hotelId') {
-                var typeLocationObj = { hotelId: id}                
+                var typeLocationObj = { hotelId: id}                 
             } else if (objectID ==='cityId') {
-                var typeLocationObj = {cityId: id}               
-            }             
+                var typeLocationObj = { cityId: id }               
+            } else if (objectID ==='iata') {
+                var typeLocationObj = { iata: id }               
+            }               
 
             const paramsObj = {                
                 checkIn: checkInDate,
@@ -239,10 +241,11 @@ router.post('/getHotelInitialData', async (request, response) => {
                 adultsCount: adults,
                 customerIP: '163.172.146.130',
                 childrenCount: childrenCount,               
-                lang: language.toLowerCase(),
-                currency: currency.toUpperCase(),
+                lang: language.toLowerCase(),               
+                currency: "RUB",
+                //currency: currency.toUpperCase(),
                 waitForResult: 0
-            }            
+            }
 
             var resultObj = {}
             var resultObj = { ...paramsObj, ...typeLocationObj, ...childrenAgeObj}

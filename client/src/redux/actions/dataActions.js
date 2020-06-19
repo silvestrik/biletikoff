@@ -45,7 +45,8 @@ import {
         SET_HOTEL_FILTERED_DATA,
         UPDATE_HOTEL_FILTERED_LENGTH,
         LENGTH_OF_STAY,
-        SEARCH_HOTEL_STATUS
+        SEARCH_HOTEL_STATUS,
+        AVIA_HOTEL_FORM_VISIBLE
     } from '../type'
 
 import store from  '../store' 
@@ -849,7 +850,7 @@ dispatch({ type: HOTEL_RESULTS_IS_EMPTY, payload: false })
                             
                             // делаем копию основого массива для дальнейших манипуляций 
                             var hotelFiltered = hotelProprosals
-                            //console.log('hotelFiltered', hotelFiltered)
+                            console.log('hotelFiltered', hotelFiltered)
 
                             // вспомогательная функция, базовая сортировка по цене
                             const hotels = sortHotels(hotelProprosals, 'rating')
@@ -1071,4 +1072,13 @@ export const hotelSort = sortType => dispatch => {
     
     const hotelSortedData = sortHotels(hotelDataFiltered, sortType)
     dispatch({ type: SET_HOTEL_FILTERED_DATA, payload: hotelSortedData })     
+}
+
+
+//переключение видимости форма-инфотабло avia-hotel
+export const aviaHotelToggleForm = data => dispatch => {
+    dispatch({
+        type: AVIA_HOTEL_FORM_VISIBLE,
+        payload: data
+    })
 }

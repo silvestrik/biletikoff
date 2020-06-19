@@ -33,8 +33,7 @@ class AviaContainer extends Component {
         } 
     } 
 
-    typeHandler = event => {      
-        
+    typeHandler = event => {  
         const type = event.target.value         
         this.props.searchFormType(type)
         
@@ -65,8 +64,7 @@ class AviaContainer extends Component {
         this.props.toggleForm(data)
     }
 
-    render() {
-      
+    render() {      
         return (
             <div>           
                 <div>
@@ -164,16 +162,13 @@ class AviaContainer extends Component {
                                {this.props.errorMessage}
                             </div>
                         </div>
-                    }                      
-                    
-                    
+                    }                     
                     <div className="col-md-3 col-lg-3 col-xl-3 d-none d-sm-none d-md-block" style={{paddingRight: 0}}>
                         { this.props.loading === true &&  this.props.ticketsLength === 0 
                            ?  <FilterSkeleton/>  
                            :  <Filter/>
                         }
                     </div> 
-
                     { this.props.ticketsLength !==0 &&
                         <>
                         <div className="col-12 col-sm-12 d-md-none d-lg-none d-xs-none d-sm-block d-block" style={{margin: "7px 0 12px 0"}}>

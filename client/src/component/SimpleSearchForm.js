@@ -30,17 +30,28 @@ class SimpleSearchForm extends Component  {
     //scrollForm
     componentDidUpdate(prevProps) {
         if(localStorage.hasOwnProperty('formData')){
-            if(this.props.formData.origin && this.props.formData.destination){                
-                if(this.props.formData.origin.name !== this.state.origin) {                    
+            console.log(this.props.formData)
+            
+            if(this.props.formData.origin){                
+                if(this.props.formData.origin.name !== this.state.origin) { 
                     this.setState({
                         origin: this.props.formData.origin.name,
-                        originIata: this.props.formData.origin.code,
+                        originIata: this.props.formData.origin.code,                    
+                        status: !this.state.status                       
+                    })                    
+                }               
+            }
+
+            if(this.props.formData.destination){                
+                if(this.props.formData.destination.name !== this.state.destination) { 
+                    this.setState({                        
                         destination: this.props.formData.destination.name,
                         destinationIata: this.props.formData.destination.code,
                         status: !this.state.status                       
                     })                    
                 }               
             }
+
         } else {
             if(prevProps.geoData.name !== this.props.geoData.name) {
                 //console.log(prevProps.geoData.name, this.props.geoData.name)
@@ -57,7 +68,7 @@ class SimpleSearchForm extends Component  {
     formSubmit = event => {       
         event.preventDefault()        
         this.props.preSimpleSearch()   
-        //console.log(this.props.formData, this.props.passData)
+        console.log('preSimpleSearch', this.props.formData, this.props.passData)
         localStorage.setItem('formData', JSON.stringify(this.props.formData))
         localStorage.setItem('passData', JSON.stringify(this.props.passData))
     }
