@@ -17,4 +17,4 @@ This project presents a flight search interface and demonstrates a structured ap
 - Travel search system implementation
 
 ## Tech Notes
-The project is part of an ongoing development workflow and may evolve over time.
+the project is part of an ongoing development workflow and may evolve over time.
